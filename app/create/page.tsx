@@ -1,23 +1,23 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import axios from "axios";
 import Image from "next/image";
-import Link from "next/link";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { tokenList } from "@/lib/types";
-import { filterImages } from "@/lib/fetch";
+import { useRouter } from "next/navigation";
+import { verifyValidImages } from "@/lib/fetch";
 
 const CACHE_KEY = "nfts";
 const CACHE_EXPIRATION = 60 * 60 * 24; // Cache expires in 24 hours (in seconds)
 
 export default function CreatePage() {
   const [selectedNft, setSelectedNft] = useState<number | null>(null);
-  const [nfts, setNfts] = useState<tokenList[]>([]);
+  const [nfts, setNfts] = useState<string[]>([]);
 
   // Function to get cached NFTs from localStorage
-  const getCachedNfts = (): tokenList[] | null => {
+  const getCachedNfts = (): string[] | null => {
     const cachedData = localStorage.getItem(CACHE_KEY);
     if (cachedData) {
       const parsedData = JSON.parse(cachedData);
@@ -39,14 +39,17 @@ export default function CreatePage() {
         return;
       }
 
-      const images = await filterImages();
-      setNfts(images);
+      const fetchedImages = await axios
+        .get("/api/nfts")
+        .then((res) => res.data);
+      const validImages = await verifyValidImages(fetchedImages);
+      setNfts(validImages);
 
       // Cache the NFTs with the current timestamp
       localStorage.setItem(
         CACHE_KEY,
         JSON.stringify({
-          nfts: images,
+          nfts: validImages,
           timestamp: Math.floor(Date.now() / 1000), // Current time in seconds
         })
       );
@@ -58,6 +61,7 @@ export default function CreatePage() {
   const handleNftSelect = (index: number) => {
     setSelectedNft(index);
   };
+  const router = useRouter();
 
   return (
     <div className="bg-gray-900 p-8 min-h-[90vh] text-white">
@@ -70,30 +74,26 @@ export default function CreatePage() {
 
       {/* Create Meme Button */}
       <div className="flex justify-center mb-10">
-        <Link
-          href={
-            selectedNft !== null
-              ? `/create/${selectedNft}?imageUrl=${encodeURIComponent(
-                  nfts[selectedNft].image_url || ""
-                )}`
-              : "#"
-          }
-          className="inline-block"
+        <Button
+          className="bg-pink-500 hover:bg-pink-600 px-8 py-4 text-lg text-white"
+          onClick={() => {
+            router.push(
+              `/create/${selectedNft}?imageUrl=${encodeURIComponent(
+                selectedNft ? nfts[selectedNft] : ""
+              )}`
+            );
+          }}
+          disabled={!selectedNft}
         >
-          <Button
-            className="bg-pink-500 hover:bg-pink-600 px-8 py-4 text-lg text-white"
-            disabled={selectedNft === null}
-          >
-            Create Meme
-          </Button>
-        </Link>
+          Create Meme
+        </Button>
       </div>
 
       {/* NFT Grid */}
       <div className="gap-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 mb-12">
         {nfts.map((nft, index) => (
           <motion.div
-            key={index} // Ensure each key is unique, using contract_address
+            key={index - 1} // Ensure each key is unique, using contract_address
             whileHover={{ scale: 1.05 }}
             onClick={() => handleNftSelect(index)}
           >
@@ -107,8 +107,8 @@ export default function CreatePage() {
                   {" "}
                   {/* Fixed height for consistency */}
                   <Image
-                    src={nft.image_url || "/placeholder.svg"}
-                    alt={nft.image_url || "NFT Image"}
+                    src={nft || "/placeholder.svg"}
+                    alt={nft || "NFT Image"}
                     layout="fill" // Makes image fill the container
                     objectFit="cover" // Ensures image covers the container while maintaining aspect ratio
                     className="w-full h-full object-cover"

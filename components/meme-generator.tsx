@@ -1,276 +1,3 @@
-// "use client";
-
-// import { useRef, useState, useEffect } from "react";
-// import { Button } from "@/components/ui/button";
-// import { Input } from "@/components/ui/input";
-// import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-// import { Slider } from "@/components/ui/slider";
-// import { ImagePlus, Type, Wand2 } from "lucide-react";
-// import {
-//   Select,
-//   SelectContent,
-//   SelectItem,
-//   SelectTrigger,
-//   SelectValue,
-// } from "@/components/ui/select";
-
-// interface MemeGeneratorProps {
-//   defaultImage: string;
-// }
-
-// export function MemeGenerator({ defaultImage }: MemeGeneratorProps) {
-//   const canvasRef = useRef<HTMLCanvasElement>(null);
-//   const [topText, setTopText] = useState("TOP TEXT");
-//   const [bottomText, setBottomText] = useState("BOTTOM TEXT");
-//   const [fontSize, setFontSize] = useState(25);
-//   const [image, setImage] = useState<HTMLImageElement | null>(null);
-//   const [textColor, setTextColor] = useState("#FF0B7A");
-//   const [textEffect, setTextEffect] = useState("none");
-//   const [imageFilter, setImageFilter] = useState("none");
-
-//   useEffect(() => {
-//     const img = new Image();
-//     img.crossOrigin = "anonymous";
-//     img.src = defaultImage;
-//     img.onload = () => setImage(img);
-//   }, [defaultImage]);
-
-//   useEffect(() => {
-//     if (!canvasRef.current || !image) return;
-
-//     const canvas = canvasRef.current;
-//     const ctx = canvas.getContext("2d");
-//     if (!ctx) return;
-
-//     // Set canvas dimensions
-//     canvas.width = image.width;
-//     canvas.height = image.height;
-
-//     // Apply image filter
-//     ctx.filter = imageFilter === "none" ? "none" : `${imageFilter}(100%)`;
-
-//     // Draw image
-//     ctx.drawImage(image, 0, 0);
-
-//     // Reset filter for text and watermark
-//     ctx.filter = "none";
-
-//     // Configure text
-//     ctx.fillStyle = textColor;
-//     ctx.strokeStyle = "black";
-//     ctx.lineWidth = fontSize / 6;
-//     ctx.font = `bold ${fontSize}px Impact`;
-//     ctx.textAlign = "center";
-
-//     // Apply text effect
-//     if (textEffect === "shadow") {
-//       ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
-//       ctx.shadowBlur = 5;
-//       ctx.shadowOffsetX = 3;
-//       ctx.shadowOffsetY = 3;
-//     }
-
-//     // Draw top text
-//     if (topText) {
-//       ctx.strokeText(topText, canvas.width / 2, fontSize + 10);
-//       ctx.fillText(topText, canvas.width / 2, fontSize + 10);
-//     }
-
-//     // Draw bottom text
-//     if (bottomText) {
-//       ctx.strokeText(bottomText, canvas.width / 2, canvas.height - 20);
-//       ctx.fillText(bottomText, canvas.width / 2, canvas.height - 20);
-//     }
-
-//     // Reset shadow effect
-//     ctx.shadowColor = "transparent";
-//     ctx.shadowBlur = 0;
-//     ctx.shadowOffsetX = 0;
-//     ctx.shadowOffsetY = 0;
-
-//     // Draw watermark
-//     ctx.font = "bold 11px Arial";
-//     ctx.fillStyle = "#FF0B7A";
-//     ctx.fillText("NFToodle", canvas.width - 30, canvas.height - 7.5);
-//   }, [
-//     image,
-//     topText,
-//     bottomText,
-//     fontSize,
-//     textColor,
-//     textEffect,
-//     imageFilter,
-//   ]);
-
-//   const handleDownload = () => {
-//     const canvas = canvasRef.current;
-//     if (!canvas) return;
-
-//     const link = document.createElement("a");
-//     link.download = "meme.png";
-//     link.href = canvas.toDataURL("image/png");
-//     link.click();
-//   };
-
-//   return (
-//     <div className="gap-8 grid md:grid-cols-[2fr,1fr] text-white">
-//       <div className="space-y-6">
-//         <div className="bg-[#1F1F1F] shadow-[#FF0B7A]/20 shadow-md p-4 rounded-lg">
-//           <canvas ref={canvasRef} className="mx-auto max-w-full h-auto" />
-//         </div>
-//         <div className="flex gap-4">
-//           <Button
-//             onClick={handleDownload}
-//             className="flex-1 bg-[#FF0B7A] hover:bg-[#FF0B7A]/90 text-white"
-//           >
-//             Download Meme
-//           </Button>
-//           <Button
-//             variant="outline"
-//             className="flex-1 border-[#FF0B7A] hover:bg-[#FF0B7A] text-[#FF0B7A] hover:text-white"
-//           >
-//             Share
-//           </Button>
-//         </div>
-//       </div>
-//       <div className="space-y-6">
-//         <div className="space-y-4 bg-[#1F1F1F] shadow-[#FF0B7A]/20 shadow-md p-4 rounded-lg">
-//           <div className="space-y-2">
-//             <label className="font-medium text-sm text-white/90">
-//               Top Text
-//             </label>
-//             <Input
-//               value={topText}
-//               onChange={(e) => setTopText(e.target.value)}
-//               placeholder="Add text"
-//               className="border-[#FF0B7A]/50 bg-black/50 text-white placeholder:text-white/50"
-//             />
-//           </div>
-//           <div className="space-y-2">
-//             <label className="font-medium text-sm text-white/90">
-//               Bottom Text
-//             </label>
-//             <Input
-//               value={bottomText}
-//               onChange={(e) => setBottomText(e.target.value)}
-//               placeholder="Add text"
-//               className="border-[#FF0B7A]/50 bg-black/50 text-white placeholder:text-white/50"
-//             />
-//           </div>
-//           <div className="space-y-2">
-//             <label className="font-medium text-sm text-white/90">
-//               Font Size: {fontSize}px
-//             </label>
-//             <Slider
-//               value={[fontSize]}
-//               onValueChange={(value) => setFontSize(value[0])}
-//               min={20}
-//               max={80}
-//               step={2}
-//             />
-//           </div>
-//         </div>
-//         <Tabs defaultValue="text" className="text-white">
-//           <TabsList className="bg-[#1F1F1F] w-full">
-//             <TabsTrigger
-//               value="templates"
-//               className="flex-1 data-[state=active]:bg-[#FF0B7A] data-[state=active]:text-white"
-//             >
-//               <ImagePlus className="mr-2 w-4 h-4" />
-//               Templates
-//             </TabsTrigger>
-//             <TabsTrigger
-//               value="text"
-//               className="flex-1 data-[state=active]:bg-[#FF0B7A] data-[state=active]:text-white"
-//             >
-//               <Type className="mr-2 w-4 h-4" />
-//               Text
-//             </TabsTrigger>
-//             <TabsTrigger
-//               value="effects"
-//               className="flex-1 data-[state=active]:bg-[#FF0B7A] data-[state=active]:text-white"
-//             >
-//               <Wand2 className="mr-2 w-4 h-4" />
-//               Effects
-//             </TabsTrigger>
-//           </TabsList>
-//           <TabsContent
-//             value="templates"
-//             className="bg-[#1F1F1F] shadow-[#FF0B7A]/20 shadow-md p-4 rounded-lg"
-//           >
-//             <div className="gap-2 grid grid-cols-3">
-//               {Array.from({ length: 6 }).map((_, i) => (
-//                 <div
-//                   key={i}
-//                   className="bg-black/50 rounded hover:ring-2 hover:ring-[#FF0B7A] cursor-pointer aspect-square"
-//                 />
-//               ))}
-//             </div>
-//           </TabsContent>
-//           <TabsContent
-//             value="text"
-//             className="space-y-4 bg-[#1F1F1F] shadow-[#FF0B7A]/20 shadow-md p-4 rounded-lg"
-//           >
-//             <div className="space-y-2">
-//               <label className="font-medium text-sm text-white/90">
-//                 Text Color
-//               </label>
-//               <Select onValueChange={setTextColor} defaultValue={textColor}>
-//                 <SelectTrigger className="border-[#FF0B7A]/50 bg-black/50 text-white">
-//                   <SelectValue placeholder="Select color" />
-//                 </SelectTrigger>
-//                 <SelectContent>
-//                   <SelectItem value="#FF0B7A">Pink</SelectItem>
-//                   <SelectItem value="#ffffff">White</SelectItem>
-//                   <SelectItem value="#000000">Black</SelectItem>
-//                   <SelectItem value="#ff0000">Red</SelectItem>
-//                   <SelectItem value="#00ff00">Green</SelectItem>
-//                   <SelectItem value="#0000ff">Blue</SelectItem>
-//                 </SelectContent>
-//               </Select>
-//             </div>
-//             <div className="space-y-2">
-//               <label className="font-medium text-sm text-white/90">
-//                 Text Effect
-//               </label>
-//               <Select onValueChange={setTextEffect} defaultValue={textEffect}>
-//                 <SelectTrigger className="border-[#FF0B7A]/50 bg-black/50 text-white">
-//                   <SelectValue placeholder="Select effect" />
-//                 </SelectTrigger>
-//                 <SelectContent>
-//                   <SelectItem value="none">None</SelectItem>
-//                   <SelectItem value="shadow">Shadow</SelectItem>
-//                 </SelectContent>
-//               </Select>
-//             </div>
-//           </TabsContent>
-//           <TabsContent
-//             value="effects"
-//             className="bg-[#1F1F1F] shadow-[#FF0B7A]/20 shadow-md p-4 rounded-lg"
-//           >
-//             <div className="space-y-2">
-//               <label className="font-medium text-sm text-white/90">
-//                 Image Filter
-//               </label>
-//               <Select onValueChange={setImageFilter} defaultValue={imageFilter}>
-//                 <SelectTrigger className="border-[#FF0B7A]/50 bg-black/50 text-white">
-//                   <SelectValue placeholder="Select filter" />
-//                 </SelectTrigger>
-//                 <SelectContent>
-//                   <SelectItem value="none">None</SelectItem>
-//                   <SelectItem value="grayscale">Grayscale</SelectItem>
-//                   <SelectItem value="sepia">Sepia</SelectItem>
-//                   <SelectItem value="invert">Invert</SelectItem>
-//                 </SelectContent>
-//               </Select>
-//             </div>
-//           </TabsContent>
-//         </Tabs>
-//       </div>
-//     </div>
-//   );
-// }
-
 "use client";
 
 import { useRef, useState, useEffect } from "react";
@@ -278,7 +5,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Slider } from "@/components/ui/slider";
-import { ImagePlus, Type, Wand2 } from "lucide-react";
+import { ImagePlus, Type, Wand2, Palette } from "lucide-react";
+
 import {
   Select,
   SelectContent,
@@ -333,9 +61,9 @@ export function MemeGenerator({ defaultImage }: MemeGeneratorProps) {
   const [textEffect, setTextEffect] = useState("none");
   const [imageFilter, setImageFilter] = useState("none");
   const [activeTab, setActiveTab] = useState("text");
+  const [backgroundColor, setBackgroundColor] = useState("#000000"); // Background color state
   const [isDownloading, setIsDownloading] = useState(false);
 
-  // Original useEffect hooks remain the same
   useEffect(() => {
     const img = new Image();
     img.crossOrigin = "anonymous";
@@ -350,11 +78,35 @@ export function MemeGenerator({ defaultImage }: MemeGeneratorProps) {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    canvas.width = image.width;
-    canvas.height = image.height;
+    // Set fixed dimensions for the canvas
+    const canvasWidth = 400; // You can adjust this as needed
+    const canvasHeight = 400; // Adjust to match the aspect ratio of your images
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
+
+    // Set background color
+    ctx.fillStyle = backgroundColor;
+    ctx.fillRect(0, 0, canvasWidth, canvasHeight); // Draw background
+
+    // Calculate aspect ratio of the image
+    const imageAspectRatio = image.width / image.height;
+
+    // Determine scaling to fit image within canvas
+    let imageWidth = canvasWidth;
+    let imageHeight = canvasWidth / imageAspectRatio;
+
+    if (imageHeight > canvasHeight) {
+      imageHeight = canvasHeight;
+      imageWidth = canvasHeight * imageAspectRatio;
+    }
+
+    const offsetX = (canvasWidth - imageWidth) / 2;
+    const offsetY = (canvasHeight - imageHeight) / 2;
+
     ctx.filter = imageFilter === "none" ? "none" : `${imageFilter}(100%)`;
-    ctx.drawImage(image, 0, 0);
+    ctx.drawImage(image, offsetX, offsetY, imageWidth, imageHeight);
     ctx.filter = "none";
+
     ctx.fillStyle = textColor;
     ctx.strokeStyle = "black";
     ctx.lineWidth = fontSize / 6;
@@ -394,6 +146,7 @@ export function MemeGenerator({ defaultImage }: MemeGeneratorProps) {
     textColor,
     textEffect,
     imageFilter,
+    backgroundColor, // Add backgroundColor to dependencies
   ]);
 
   const handleDownload = async () => {
@@ -426,7 +179,10 @@ export function MemeGenerator({ defaultImage }: MemeGeneratorProps) {
           whileHover={{ scale: 1.02 }}
           transition={{ type: "spring", stiffness: 300, damping: 20 }}
         >
-          <canvas ref={canvasRef} className="mx-auto max-w-full h-auto" />
+          <canvas
+            ref={canvasRef}
+            className="border-neutral-400 mx-auto border max-w-full h-auto"
+          />
         </motion.div>
         <div className="flex gap-4">
           <motion.div
@@ -521,7 +277,7 @@ export function MemeGenerator({ defaultImage }: MemeGeneratorProps) {
           onValueChange={setActiveTab}
         >
           <TabsList className="bg-[#1F1F1F] w-full">
-            {["templates", "text", "effects"].map((tab) => (
+            {["templates", "text", "effects", "background"].map((tab) => (
               <motion.div
                 key={tab}
                 variants={tabVariants}
@@ -537,6 +293,7 @@ export function MemeGenerator({ defaultImage }: MemeGeneratorProps) {
                   )}
                   {tab === "text" && <Type className="mr-2 w-4 h-4" />}
                   {tab === "effects" && <Wand2 className="mr-2 w-4 h-4" />}
+                  {tab === "background" && <Palette className="mr-2 w-4 h-4" />}
                   {tab.charAt(0).toUpperCase() + tab.slice(1)}
                 </TabsTrigger>
               </motion.div>
@@ -626,6 +383,33 @@ export function MemeGenerator({ defaultImage }: MemeGeneratorProps) {
                       <SelectItem value="grayscale">Grayscale</SelectItem>
                       <SelectItem value="sepia">Sepia</SelectItem>
                       <SelectItem value="invert">Invert</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </TabsContent>
+
+              {/* Background Color Tab */}
+              <TabsContent
+                value="background"
+                className="bg-[#1F1F1F] shadow-[#FF0B7A]/20 shadow-md p-4 rounded-lg"
+              >
+                <div className="space-y-2">
+                  <label className="font-medium text-sm text-white/90">
+                    Background Color
+                  </label>
+                  <Select
+                    onValueChange={setBackgroundColor}
+                    defaultValue={backgroundColor}
+                  >
+                    <SelectTrigger className="border-[#FF0B7A]/50 bg-black/50 text-white">
+                      <SelectValue placeholder="Select background color" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="#000000">Black</SelectItem>
+                      <SelectItem value="#ffffff">White</SelectItem>
+                      <SelectItem value="#ff0000">Red</SelectItem>
+                      <SelectItem value="#00ff00">Green</SelectItem>
+                      <SelectItem value="#0000ff">Blue</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

@@ -11,6 +11,10 @@ const nextConfig = {
                 protocol: 'https',
                 hostname: 'toc.otmnft.com',
             },
+            {
+                protocol: 'https',
+                hostname: 'docs.looksrare.org',
+            },
         ],
     },
 

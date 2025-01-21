@@ -2,7 +2,7 @@ import { createWallet } from "thirdweb/wallets";
 
 import { createThirdwebClient } from "thirdweb";
 
-const clientKey=process.env.THIRDWEB_CLIENT_ID
+const clientKey = process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID
 export const client = createThirdwebClient({
     clientId: `${clientKey}`,
 });
