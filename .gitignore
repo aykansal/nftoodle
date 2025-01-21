@@ -36,3 +36,5 @@ bun.lockb
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+.vercel

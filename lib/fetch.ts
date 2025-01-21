@@ -1,8 +1,10 @@
 import { nft, tokenList } from "./types";
 
+const unleashKey= process.env.UNLEASH_API_KEY;
+
 const options = {
     method: 'GET',
-    headers: { accept: 'application/json', 'x-api-key': `${process.env.NEXT_PUBLIC_UNLEASH_API_KEY}` }
+    headers: { accept: 'application/json', 'x-api-key': `${unleashKey}` }
 };
 
 // all marketplace-data
