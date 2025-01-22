@@ -15,6 +15,14 @@ const nextConfig = {
                 protocol: 'https',
                 hostname: 'docs.looksrare.org',
             },
+            {
+                protocol: 'https',
+                hostname: 'nfts.renga.app',
+            },
+            {
+                protocol: 'https',
+                hostname: 'ipfs.io',
+            },
         ],
     },
 

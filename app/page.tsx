@@ -1,38 +1,77 @@
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Triangle, Circle, Square } from "lucide-react"
+"use client";
+
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Triangle, Circle, Square } from "lucide-react";
+import { motion } from "framer-motion";
 
 export default function LandingPage() {
   return (
-    <div className="flex flex-col justify-center items-center bg-gray-900 p-8 min-h-screen text-white">
-      <h1 className="mb-6 font-bold text-5xl text-pink-500">NFToodle</h1>
-      <p className="mb-12 max-w-2xl text-2xl text-center text-green-400">
-        Transform NFTs into hilarious memes. Join the game, share the laughter!
-      </p>
+    <div className="relative flex flex-col justify-center items-center bg-[#0A0A0A] p-8 min-h-[90vh] text-white overflow-hidden">
+      <motion.div
+        initial={{ opacity: 0, y: -50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="text-center"
+      >
+        <h1 className="mb-6 font-bold text-[#FF0B7A] text-6xl md:text-7xl">
+          NFT<span className="text-white">oodle</span>
+        </h1>
+        <p className="mb-12 max-w-2xl text-[#45D62E] text-2xl text-center md:text-3xl">
+          Transform NFTs into hilarious memes. Join the game, share the
+          laughter!
+        </p>
+      </motion.div>
 
-      <div className="flex space-x-6 mb-16">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.5 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.3, duration: 0.5 }}
+        className="flex sm:flex-row flex-col sm:space-x-6 space-y-4 sm:space-y-0 mb-16"
+      >
         <Link href="/create">
-          <Button className="bg-pink-500 hover:bg-pink-600 px-8 py-6 text-lg">Create Meme</Button>
-        </Link>
-        <Link href="/gallery">
-          <Button
-            variant="ghost"
-            className="bg-neutral-100 hover:bg-neutral-200 px-8 py-6 text-lg text-pink-600"
-          >
-            View Gallery
+          <Button className="bg-[#FF0B7A] hover:bg-[#FF3B9A] px-8 py-6 font-bold text-lg transform transition-all duration-300 ease-in-out hover:scale-105">
+            Create Meme
           </Button>
         </Link>
-      </div>
+        {/* <Link href="/gallery"> */}
+        <Button
+          variant="outline"
+          className="border-[#FF0B7A] border-2 hover:bg-[#FF0B7A] px-8 py-6 font-bold text-[#FF0B7A] text-lg hover:text-white transform transition-all duration-300 ease-in-out hover:scale-105"
+          disabled={true}
+        >
+          Gallery Soon...
+        </Button>
+        {/* </Link> */}
+      </motion.div>
 
-      <div className="flex justify-center items-center space-x-12 mb-12">
-        <Triangle className="w-16 h-16 text-pink-500 animate-bounce" />
-        <Circle className="w-16 h-16 text-purple-500 animate-pulse" />
-        <Square className="w-16 h-16 text-green-500 animate-spin" />
-      </div>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.6, duration: 0.5 }}
+        className="flex justify-center items-center space-x-12 mb-12"
+      >
+        <Triangle className="w-16 h-16 text-[#FF0B7A] animate-bounce" />
+        <Circle className="w-16 h-16 text-[#45D62E] animate-pulse" />
+        <Square className="w-16 h-16 text-[#FF0B7A] animate-spin" />
+      </motion.div>
 
       <footer className="bottom-4 absolute text-gray-400 text-sm">
-        &copy; 2025 NFToodle. All rights reserved.
+        Made with 💖 by{" "}
+        <Link
+          href="https://x.com/aykansal"
+          className="text-[#FF0B7A] hover:underline"
+        >
+          Aykansal
+        </Link>
       </footer>
+
+      {/* Background shapes */}
+      <div className="top-0 left-0 z-[-1] absolute w-full h-full overflow-hidden">
+        <div className="top-1/4 left-1/4 absolute bg-[#FF0B7A] opacity-20 blur-xl rounded-full w-64 h-64 animate-blob filter mix-blend-multiply"></div>
+        <div className="top-3/4 right-1/4 absolute bg-[#45D62E] opacity-20 blur-xl rounded-full w-64 h-64 animate-blob animation-delay-2000 filter mix-blend-multiply"></div>
+        <div className="bottom-1/4 left-1/3 absolute bg-[#FF0B7A] opacity-20 blur-xl rounded-full w-64 h-64 animate-blob animation-delay-4000 filter mix-blend-multiply"></div>
+      </div>
     </div>
-  )
+  );
 }

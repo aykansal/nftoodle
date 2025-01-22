@@ -1,5 +1,5 @@
 export const verifyValidImages = async (imageUrls: string[]) => {
-    const validTokens = [];
+    const validTokens: string[] = [];
     for (const url of imageUrls) {
         try {
             const img = new Image();

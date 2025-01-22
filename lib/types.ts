@@ -10,3 +10,76 @@ export interface nft {
 export interface tokenList {
     image_url: string;
 }
+
+// opensea nft collectons types
+export interface Media {
+    gateway: string;
+    thumbnail: string;
+    raw: string;
+    format: string;
+    bytes: number;
+}
+
+export interface TokenMetadata {
+    tokenType: string;
+}
+
+export interface TokenId {
+    tokenId: string;
+    tokenMetadata: TokenMetadata;
+}
+
+export interface TokenUri {
+    gateway: string;
+    raw: string;
+}
+
+export interface Attribute {
+    value: string;
+    trait_type: string;
+}
+
+export interface Metadata {
+    name: string;
+    description: string;
+    image: string;
+    attributes: Attribute[];
+}
+
+export interface ContractMetadata {
+    name: string;
+    symbol: string;
+    tokenType: string;
+    contractDeployer: string;
+    deployedBlockNumber: number;
+    openSea: OpenSeaMetadata;
+    lastIngestedAt: string;
+}
+
+export interface OpenSeaMetadata {
+    floorPrice: number;
+    collectionName: string;
+    collectionSlug: string;
+    safelistRequestStatus: string;
+    imageUrl: string;
+    description: string;
+    twitterUsername: string;
+    discordUrl: string;
+    bannerImageUrl: string;
+}
+
+export interface Contract {
+    address: string;
+}
+
+export interface NFTItem {
+    contract: Contract;
+    id: TokenId;
+    title: string;
+    description: string;
+    tokenUri: TokenUri;
+    media: Media[];
+    metadata: Metadata;
+    timeLastUpdated: string;
+    contractMetadata: ContractMetadata;
+}
