@@ -18,8 +18,14 @@ export default function AuthProvider({
           <br />
           ☕️ Connect it to join the fun!
         </p>
-        <footer className="absolute bottom-4 text-gray-400 text-sm">
-          Made with 💖 by <Link href={"https://x.com/aykansal"}>Aykansal</Link>
+        <footer className="bottom-4 absolute text-gray-400 text-sm">
+          Made with 💖 by{" "}
+          <Link
+            href="https://x.com/aykansal"
+            className="text-[#FF0B7A] hover:underline"
+          >
+            Aykansal
+          </Link>
         </footer>
       </div>
     );

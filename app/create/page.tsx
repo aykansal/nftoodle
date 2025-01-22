@@ -1,5 +1,6 @@
-"use client";
+// app/create/page.tsx
 
+"use client";
 import { useEffect, useState } from "react";
 
 import axios from "axios";
@@ -13,13 +14,14 @@ import { verifyValidImages } from "@/lib/verify";
 import { Card, CardContent } from "@/components/ui/card";
 
 const CACHE_KEY = "nfts";
-const CACHE_EXPIRATION = 60 * 60 * 24; // Cache expires in 24 hours (in seconds)
+const CACHE_EXPIRATION = 60 * 60 * 2; // Cache expires in 24 hours (in seconds)
 
 export default function CreatePage() {
   const [selectedNft, setSelectedNft] = useState<number | null>(null);
   const [nfts, setNfts] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [, setIsVerifying] = useState(false);
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   const getCachedNfts = (): string[] | null => {
     const cachedData = localStorage.getItem(CACHE_KEY);
@@ -51,8 +53,6 @@ export default function CreatePage() {
         setIsVerifying(true);
         const validImages = await verifyValidImages(fetchedImages);
         setNfts(validImages);
-        setIsVerifying(false);
-
         localStorage.setItem(
           CACHE_KEY,
           JSON.stringify({
@@ -71,9 +71,17 @@ export default function CreatePage() {
     fetchNfts();
   }, []);
 
-  // const handleNftSelect = (index: number) => {
-  //   setSelectedNft(index);
-  // };
+  const handleNftClick = (index: number) => {
+    if (isRedirecting) return;
+    setSelectedNft(index);
+    setIsRedirecting(true);
+
+    setTimeout(() => {
+      window.location.href = `/create/${index}?imageUrl=${encodeURIComponent(
+        nfts[index]
+      )}`;
+    }, 100);
+  };
 
   return (
     <div className="relative bg-[#0A0A0A] p-8 min-h-screen text-white overflow-hidden">
@@ -111,10 +119,11 @@ export default function CreatePage() {
             {nfts.map((nft, index) => (
               <Link
                 key={index}
+                onClick={() => handleNftClick(index)}
                 href={`/create/${index}?imageUrl=${encodeURIComponent(nft)}`}
               >
                 <motion.div
-                  onClick={() => setSelectedNft(index)}
+                  // onClick={() => setSelectedNft(index)}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >

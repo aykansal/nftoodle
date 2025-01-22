@@ -2,10 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family: Arial, Helvetica, sans-serif;
-}
-
 @layer utilities {
   .text-balance {
     text-wrap: balance;
@@ -70,7 +66,7 @@ body {
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-border font-squid;
   }
   body {
     @apply bg-background text-foreground;

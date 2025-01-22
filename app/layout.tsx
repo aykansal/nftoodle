@@ -4,15 +4,11 @@ import "./globals.css";
 import { ThirdwebProvider } from "thirdweb/react";
 import AuthProvider from "@/components/AuthProvider";
 import { Header } from "@/components/header";
+import { Toaster } from "@/components/ui/sonner";
 
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
+const squid = localFont({
+  src: "./fonts/squid.woff",
+  variable: "--font-squid",
   weight: "100 900",
 });
 
@@ -29,11 +25,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${squid.variable} antialiased`}
       >
         <ThirdwebProvider>
           <Header />
           <AuthProvider>{children}</AuthProvider>
+          <Toaster/>
         </ThirdwebProvider>
       </body>
     </html>

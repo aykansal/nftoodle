@@ -1,13 +1,26 @@
-"use client";
+// app/page.tsx
 
+"use client";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Triangle, Circle, Square } from "lucide-react";
+import { Triangle, Circle, Square, HandMetal } from "lucide-react";
 import { motion } from "framer-motion";
+import { AnimatedGradientText } from "@/components/ui/animatedGradient";
+import { cn } from "@/lib/utils";
 
 export default function LandingPage() {
   return (
     <div className="relative flex flex-col justify-center items-center bg-[#0A0A0A] p-8 min-h-[90vh] text-white overflow-hidden">
+      <AnimatedGradientText className="top-5 z-10 absolute">
+        <HandMetal className="mr-1 transition-transform group-hover:translate-x-0.5 duration-300 ease-in-out size-3" />
+        <span
+          className={cn(
+            `inline animate-gradient bg-gradient-to-r from-[#ffaa40] via-[#9c40ff] to-[#ffaa40] bg-[length:var(--bg-size)_100%] bg-clip-text text-transparent`
+          )}
+        >
+          Meme Spaces Comming Soon
+        </span>
+      </AnimatedGradientText>
       <motion.div
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
@@ -35,13 +48,13 @@ export default function LandingPage() {
           </Button>
         </Link>
         {/* <Link href="/gallery"> */}
-        <Button
+        {/* <Button
           variant="outline"
           className="border-[#FF0B7A] border-2 hover:bg-[#FF0B7A] px-8 py-6 font-bold text-[#FF0B7A] text-lg hover:text-white transform transition-all duration-300 ease-in-out hover:scale-105"
           disabled={true}
         >
-          Gallery Soon...
-        </Button>
+          Nft Spaces Comming Soon
+        </Button> */}
         {/* </Link> */}
       </motion.div>
 
@@ -63,6 +76,13 @@ export default function LandingPage() {
           className="text-[#FF0B7A] hover:underline"
         >
           Aykansal
+        </Link>
+        {" & "}
+        <Link
+          href="https://x.com/satyanshmittal"
+          className="text-[#FF0B7A] hover:underline"
+        >
+          Satyansh
         </Link>
       </footer>
 

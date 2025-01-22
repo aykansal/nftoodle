@@ -11,6 +11,27 @@ export interface tokenList {
     image_url: string;
 }
 
+export interface MemeGeneratorProps {
+    defaultImage: string;
+}
+
+export interface CloudinaryUploadResponse {
+    asset_id: string;
+    public_id: string;
+    format: string;
+    version: number;
+    resource_type: string;
+    type: string;
+    created_at: string;
+    bytes: number;
+    width: number;
+    height: number;
+    asset_folder: string;
+    display_name: string;
+    url: string;
+    secure_url: string;
+}
+
 // opensea nft collectons types
 export interface Media {
     gateway: string;
