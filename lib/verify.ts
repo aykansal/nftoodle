@@ -10,7 +10,6 @@ export const verifyValidImages = async (imageUrls: string[]) => {
             });
             validTokens.push(url);
         } catch {
-            console.warn(`Invalid image URL skipped: ${url}`);
         }
     }
     return validTokens;

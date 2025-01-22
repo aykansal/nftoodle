@@ -23,7 +23,7 @@ async function fetchOpenSeaCollection(
     .catch((error) => {
       console.log(error.message);
     });
-  const imageUrls = fetchedImages?.map((item: NFTItem) => item.metadata.image);
+  const imageUrls = fetchedImages?.map((item: NFTItem) => item?.media[0].thumbnail);
   return imageUrls;
 }
 
@@ -61,8 +61,8 @@ export async function GET() {
       .filter((token: tokenList) => token.image_url)
       ?.map((token: tokenList) => token.image_url);
 
-    const alchemyUrlsCl1: string[] = await fetchOpenSeaCollection(
-      "0x394E3d3044fC89fCDd966D3cb35Ac0B32B0Cda91",
+    const alchemyUrlsCl1 = await fetchOpenSeaCollection(
+      "0xef0182dc0574cd5874494a120750fd222fdb909a",
       alchemyKey,
     );
 
@@ -80,7 +80,7 @@ export async function GET() {
     const distinctAlchemyUrlsCl2: string[] = getDistinctValues(alchemyUrlsCl2);
 
     const distinctAlchemyUrls = distinctAlchemyUrlsCl1.concat(distinctAlchemyUrlsCl2);
-    distinctAlchemyUrls.sort(() => Math.random() - 0.5); // shuffle the array fro variety showcase
+    distinctAlchemyUrls.sort(() => Math.random() - 0.5);
     const combinedUrls = distinctUnleashUrls.concat(distinctAlchemyUrls);
 
     return NextResponse.json(combinedUrls);

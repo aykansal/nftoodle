@@ -17,11 +17,7 @@ const nextConfig = {
             },
             {
                 protocol: 'https',
-                hostname: 'nfts.renga.app',
-            },
-            {
-                protocol: 'https',
-                hostname: 'ipfs.io',
+                hostname: 'res.cloudinary.com',
             },
         ],
     },

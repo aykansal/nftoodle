@@ -1,13 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
+
 import axios from "axios";
+import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { Card, CardContent } from "@/components/ui/card";
-import { useRouter } from "next/navigation";
-import { verifyValidImages } from "@/lib/verify";
 import { Triangle, Circle, Square } from "lucide-react";
+
+import { verifyValidImages } from "@/lib/verify";
+
+import { Card, CardContent } from "@/components/ui/card";
 
 const CACHE_KEY = "nfts";
 const CACHE_EXPIRATION = 60 * 60 * 24; // Cache expires in 24 hours (in seconds)
@@ -17,7 +20,6 @@ export default function CreatePage() {
   const [nfts, setNfts] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [, setIsVerifying] = useState(false);
-  const router = useRouter();
 
   const getCachedNfts = (): string[] | null => {
     const cachedData = localStorage.getItem(CACHE_KEY);
@@ -46,10 +48,8 @@ export default function CreatePage() {
         const fetchedImages = await axios
           .get("/api/nfts")
           .then((res) => res.data);
-        console.log(fetchedImages);
         setIsVerifying(true);
         const validImages = await verifyValidImages(fetchedImages);
-        console.log(validImages);
         setNfts(validImages);
         setIsVerifying(false);
 
@@ -91,27 +91,6 @@ export default function CreatePage() {
         </p>
       </motion.div>
 
-      {/* <motion.div
-        initial={{ opacity: 0, scale: 0.5 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.3, duration: 0.5 }}
-        className="flex justify-center mb-10"
-      >
-        <Button
-          className="bg-[#FF0B7A] hover:bg-[#FF3B9A] disabled:opacity-50 px-8 py-4 font-bold text-lg transform transition-all duration-300 disabled:cursor-not-allowed ease-in-out hover:scale-105"
-          onClick={() => {
-            router.push(
-              `/create/${selectedNft}?imageUrl=${encodeURIComponent(
-                selectedNft !== null ? nfts[selectedNft] : ""
-              )}`
-            );
-          }}
-          disabled={selectedNft === null}
-        >
-          Create Meme
-        </Button>
-      </motion.div> */}
-
       {loading ? (
         <div>
           <div className="flex justify-center items-center space-x-4">
@@ -119,7 +98,6 @@ export default function CreatePage() {
             <Circle className="w-12 h-12 text-[#45D62E] animate-pulse" />
             <Square className="w-12 h-12 text-[#FF0B7A] animate-bounce" />
           </div>
-          {/* {isVerifying && <p>Verifying images...</p>} */}
         </div>
       ) : (
         <AnimatePresence>
@@ -131,37 +109,37 @@ export default function CreatePage() {
             className="gap-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 mb-12"
           >
             {nfts.map((nft, index) => (
-              <motion.div
+              <Link
                 key={index}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => {
-                  // handleNftSelect(index)
-                  setSelectedNft(index);
-                  router.push("/create/0?imageUrl=" + encodeURIComponent(nft));
-                }}
+                href={`/create/${index}?imageUrl=${encodeURIComponent(nft)}`}
               >
-                <Card
-                  className={`bg-gray-800 border-2 ${
-                    selectedNft === index
-                      ? "border-[#45D62E]"
-                      : "border-[#FF0B7A]"
-                  } overflow-hidden cursor-pointer transition-all duration-300`}
+                <motion.div
+                  onClick={() => setSelectedNft(index)}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
-                  <CardContent className="relative p-0">
-                    <div className="relative w-full h-72">
-                      <Image
-                        src={nft || "/placeholder.svg"}
-                        alt={`NFT ${index + 1}`}
-                        layout="fill"
-                        objectFit="cover"
-                        className="w-full h-full object-cover"
-                        priority
-                      />
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
+                  <Card
+                    className={`bg-gray-800 border-2 ${
+                      selectedNft === index
+                        ? "border-[#45D62E]"
+                        : "border-[#FF0B7A]"
+                    } overflow-hidden cursor-pointer transition-all duration-300`}
+                  >
+                    <CardContent className="relative p-0">
+                      <div className="relative w-full h-72">
+                        <Image
+                          src={nft || "/placeholder.svg"}
+                          alt={`NFT ${index + 1}`}
+                          layout="fill"
+                          objectFit="cover"
+                          className="w-full h-full object-cover"
+                          priority
+                        />
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              </Link>
             ))}
           </motion.div>
         </AnimatePresence>
