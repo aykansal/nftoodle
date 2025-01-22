@@ -18,7 +18,7 @@ export default function CreatePage() {
   const [nfts, setNfts] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
-  const [isVerifying, setIsVerifying] = useState(false);
+  const [, setIsVerifying] = useState(false);
 
   const getCachedNfts = (): string[] | null => {
     const cachedData = localStorage.getItem(CACHE_KEY);
