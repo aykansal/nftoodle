@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 import { verifyValidImages } from "@/lib/verify";
@@ -17,8 +16,8 @@ export default function CreatePage() {
   const [selectedNft, setSelectedNft] = useState<number | null>(null);
   const [nfts, setNfts] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
-  const router = useRouter();
   const [, setIsVerifying] = useState(false);
+  const router = useRouter();
 
   const getCachedNfts = (): string[] | null => {
     const cachedData = localStorage.getItem(CACHE_KEY);
@@ -72,9 +71,9 @@ export default function CreatePage() {
     fetchNfts();
   }, []);
 
-  const handleNftSelect = (index: number) => {
-    setSelectedNft(index);
-  };
+  // const handleNftSelect = (index: number) => {
+  //   setSelectedNft(index);
+  // };
 
   return (
     <div className="relative bg-[#0A0A0A] p-8 min-h-screen text-white overflow-hidden">
@@ -92,7 +91,7 @@ export default function CreatePage() {
         </p>
       </motion.div>
 
-      <motion.div
+      {/* <motion.div
         initial={{ opacity: 0, scale: 0.5 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.3, duration: 0.5 }}
@@ -111,7 +110,7 @@ export default function CreatePage() {
         >
           Create Meme
         </Button>
-      </motion.div>
+      </motion.div> */}
 
       {loading ? (
         <div>
@@ -136,7 +135,11 @@ export default function CreatePage() {
                 key={index}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => handleNftSelect(index)}
+                onClick={() => {
+                  // handleNftSelect(index)
+                  setSelectedNft(index);
+                  router.push("/create/0?imageUrl=" + encodeURIComponent(nft));
+                }}
               >
                 <Card
                   className={`bg-gray-800 border-2 ${
