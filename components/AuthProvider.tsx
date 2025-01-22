@@ -26,6 +26,13 @@ export default function AuthProvider({
           >
             Aykansal
           </Link>
+          &
+          <Link
+            href="https://x.com/satyanshmittal"
+            className="text-[#FF0B7A] hover:underline"
+          >
+            Satyansh
+          </Link>
         </footer>
       </div>
     );
