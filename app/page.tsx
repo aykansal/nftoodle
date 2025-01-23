@@ -72,7 +72,8 @@ export default function LandingPage() {
 
       <footer className="bottom-4 absolute text-gray-400 text-sm">
         Made with 💖 by{" "}
-        <Link
+        <span className="text-[#FF0B7A] hover:underline">Us</span>
+        {/* <Link
           href="https://x.com/aykansal"
           className="text-[#FF0B7A] hover:underline"
         >
@@ -84,7 +85,7 @@ export default function LandingPage() {
           className="text-[#FF0B7A] hover:underline"
         >
           Satyansh
-        </Link>
+        </Link> */}
       </footer>
 
       {/* Background shapes */}

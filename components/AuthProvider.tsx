@@ -1,5 +1,5 @@
 "use client";
-import Link from "next/link";
+// import Link from "next/link";
 import React from "react";
 import { useActiveAccount } from "thirdweb/react";
 
@@ -19,20 +19,20 @@ export default function AuthProvider({
           ☕️ Connect it to join the fun!
         </p>
         <footer className="bottom-4 absolute text-gray-400 text-sm">
-          Made with 💖 by{" "}
-          <Link
-            href="https://x.com/aykansal"
+          Made with 💖 by
+          <span
+            // href="https://x.com/aykansal"
             className="text-[#FF0B7A] hover:underline"
           >
-            Aykansal
-          </Link>
-          &
+            Us
+          </span>
+          {/* &
           <Link
             href="https://x.com/satyanshmittal"
             className="text-[#FF0B7A] hover:underline"
           >
             Satyansh
-          </Link>
+          </Link> */}
         </footer>
       </div>
     );
