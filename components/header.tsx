@@ -1,8 +1,4 @@
 "use client";
-
-import { ConnectButton } from "thirdweb/react";
-import ConnectWallet from "@/components/thirdweb/ConnectWallet";
-import { client, wallet } from "@/lib/thirdweb";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Wallet from "@/components/thirdweb/ConnectWallet";
