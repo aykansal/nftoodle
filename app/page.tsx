@@ -27,10 +27,10 @@ export default function LandingPage() {
         transition={{ duration: 0.5 }}
         className="text-center"
       >
-        <h1 className="mb-6 font-bold text-[#FF0B7A] text-6xl md:text-7xl">
+        <h1 className="mb-6 font-bold text-[#FF0B7A] font-squid text-6xl md:text-7xl">
           NFT<span className="text-white">oodle</span>
         </h1>
-        <p className="mb-12 max-w-2xl text-[#45D62E] text-2xl text-center md:text-3xl">
+      <p className="mb-12 max-w-2xl text-[#45D62E] font-ibm text-2xl text-center md:text-3xl">
           Transform NFTs into hilarious memes. Join the game, share the
           laughter!
         </p>
@@ -43,7 +43,8 @@ export default function LandingPage() {
         className="flex sm:flex-row flex-col sm:space-x-6 space-y-4 sm:space-y-0 mb-16"
       >
         <Link href="/create">
-          <Button className="bg-[#FF0B7A] hover:bg-[#FF3B9A] px-8 py-6 font-bold text-lg transform transition-all duration-300 ease-in-out hover:scale-105">
+          <Button className="bg-[#FF0B7A] hover:bg-[#FF3B9A] px-8 py-6 font-bold text-lg transform transition-all duration-300 ease-in-out
+          font-ibm hover:scale-105">
             Create Meme
           </Button>
         </Link>

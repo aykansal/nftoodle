@@ -68,6 +68,7 @@ const config: Config = {
 			},
 			fontFamily: {
 				squid: 'var(--font-squid)',
+				ibm: 'var(--font-ibm-plex-mono)'
 			}
 		}
 	},
