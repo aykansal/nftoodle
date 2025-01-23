@@ -1,9 +1,11 @@
 "use client";
 
 import { ConnectButton } from "thirdweb/react";
+import ConnectWallet from "@/components/thirdweb/ConnectWallet";
 import { client, wallet } from "@/lib/thirdweb";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import Wallet from "@/components/thirdweb/ConnectWallet";
 
 export function Header() {
   const navItems = [
@@ -38,13 +40,7 @@ export function Header() {
             </Link>
           ))}
         </nav>
-        <ConnectButton
-          // className="bg-[#FF0B7A] hover:bg-[#FF3B9A] px-4 py-2 rounded-full text-white transition-colors duration-300 ease-in-out"
-          client={client}
-          wallets={[wallet]}
-          autoConnect={true}
-          // className="relative z-10 bg-[#FF0B7A] hover:bg-[#FF3B9A] hover:shadow-lg hover:shadow-[#FF0B7A]/30 px-6 py-2 rounded-full font-semibold text-white transform transition-all duration-300 ease-in-out hover:scale-105"page
-        />
+        <Wallet />
       </div>
     </header>
   );
