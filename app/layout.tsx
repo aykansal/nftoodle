@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+// import {IBM_Plex_Mono} from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 import { ThirdwebProvider } from "thirdweb/react";
@@ -10,6 +11,12 @@ const squid = localFont({
   src: "./fonts/squid.woff",
   variable: "--font-squid",
   weight: "100 900",
+});
+
+const ibm = localFont({
+  src: "./fonts/IBMPlexMono-Medium.ttf",
+  weight: "100 900",
+  variable: '--font-ibm-plex-mono',
 });
 
 export const metadata: Metadata = {
@@ -25,7 +32,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${squid.variable} antialiased`}
+        className={`${squid.variable} ${ibm.variable} antialiased`}
+        
       >
         <ThirdwebProvider>
           <Header />
