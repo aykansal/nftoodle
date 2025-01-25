@@ -1,6 +1,6 @@
 import { Circle, Square, Triangle } from "lucide-react";
 
-export default () => {
+export default function Loader ()  {
   return (
     <div className="min-h-full flex justify-center items-center space-x-4">
       <Triangle className="w-12 h-12 text-[#FF0B7A] animate-bounce" />

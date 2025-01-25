@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Loader from "@/components/loader";
 import { useRouter } from "next/navigation";
-import { Home, RefreshCcw, X } from "lucide-react";
+import { Home, RefreshCcw} from "lucide-react";
 import { Modal } from "@/components/ui/modal";
 
 type GameCard = {
@@ -18,7 +18,7 @@ type GameCard = {
   isMatched: boolean;
 };
 
-export default function matchmeme() {
+export default function Matchmeme() {
   const router = useRouter();
   const [memes, setMemes] = useState<CloudinaryUploadResponse[]>([]);
   const [cards, setCards] = useState<GameCard[]>([]);
@@ -30,7 +30,7 @@ export default function matchmeme() {
   const [score, setScore] = useState<number>(0);
   const [bestScore, setBestScore] = useState<number>(0);
   const [imagesLoaded, setImagesLoaded] = useState<boolean>(false);
-  const [preloadedImages, setPreloadedImages] = useState<{
+  const [, setPreloadedImages] = useState<{
     [key: string]: HTMLImageElement;
   }>({});
   const [showEndGameModal, setShowEndGameModal] = useState(false);

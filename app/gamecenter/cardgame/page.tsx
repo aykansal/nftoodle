@@ -125,6 +125,7 @@ export default function CardGame() {
     return playerTotal - computerTotal;
   };
 
+  useEffect(() => {
   const checkGameOver = () => {
     const allPlayerCardsPlayed = playerCards.every(card => card.isPlayed);
     const allComputerCardsPlayed = computerCards.every(card => card.isPlayed);
@@ -134,20 +135,19 @@ export default function CardGame() {
     }
   };
 
-  useEffect(() => {
     if (gameStarted && !gameOver) {
       checkGameOver();
     }
-  }, [playerCards, computerCards]);
+  }, [playerCards, computerCards, gameStarted, gameOver]);
 
   const handleGameOver = () => {
     setGameOver(true);
     setShowGameSummaryModal(true);
   };
 
-  const handleEndGame = () => {
-    setShowEndGameModal(true);
-  };
+  // const handleEndGame = () => {
+  //   setShowEndGameModal(true);
+  // };
 
   const handleEndGameConfirm = () => {
     setShowEndGameModal(false);
