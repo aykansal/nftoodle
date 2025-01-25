@@ -1,17 +1,15 @@
-// app/create/page.tsx
-
 "use client";
 import { useEffect, useState } from "react";
 
 import axios from "axios";
 import Link from "next/link";
 import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
-import { Triangle, Circle, Square } from "lucide-react";
-
 import { verifyValidImages } from "@/lib/verify";
-
+import usePagination from "@/hooks/usePagination";
+import { Pagination } from "@/components/ui/pagination";
+import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
+import Loader from "@/components/loader";
 
 const CACHE_KEY = "nfts";
 const CACHE_EXPIRATION = 60 * 60 * 2; // Cache expires in 24 hours (in seconds)
@@ -22,6 +20,12 @@ export default function CreatePage() {
   const [loading, setLoading] = useState(true);
   const [, setIsVerifying] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
+
+  const { currentItems, currentPage, totalPages, handlePageChange } =
+    usePagination({
+      items: nfts,
+      itemsPerPage: 9,
+    });
 
   const getCachedNfts = (): string[] | null => {
     const cachedData = localStorage.getItem(CACHE_KEY);
@@ -84,7 +88,7 @@ export default function CreatePage() {
   };
 
   return (
-    <div className="relative bg-[#0A0A0A] p-8 min-h-screen text-white overflow-hidden">
+    <div className="relative p-8 min-h-screen h-full text-white overflow-hidden">
       <motion.div
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
@@ -94,19 +98,13 @@ export default function CreatePage() {
         <h1 className="mb-3 font-bold text-[#FF0B7A] text-5xl">
           Select an NFT to Memeify
         </h1>
-        <p className="text-[#45D62E] text-xl font-ibm">
+        <p className="text-[#45D62E] font-ibm text-xl font-ibm">
           Choose your favorite NFT and turn it into a hilarious meme!
         </p>
       </motion.div>
 
       {loading ? (
-        <div>
-          <div className="flex justify-center items-center space-x-4">
-            <Triangle className="w-12 h-12 text-[#FF0B7A] animate-spin" />
-            <Circle className="w-12 h-12 text-[#45D62E] animate-pulse" />
-            <Square className="w-12 h-12 text-[#FF0B7A] animate-bounce" />
-          </div>
-        </div>
+        <Loader />
       ) : (
         <AnimatePresence>
           <motion.div
@@ -116,14 +114,13 @@ export default function CreatePage() {
             transition={{ duration: 0.5 }}
             className="gap-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 mb-12"
           >
-            {nfts.map((nft, index) => (
+            {currentItems.map((nft, index) => (
               <Link
                 key={index}
                 onClick={() => handleNftClick(index)}
                 href={`/create/${index}?imageUrl=${encodeURIComponent(nft)}`}
               >
                 <motion.div
-                  // onClick={() => setSelectedNft(index)}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
@@ -154,20 +151,18 @@ export default function CreatePage() {
         </AnimatePresence>
       )}
 
-      <footer className="mt-16 text-center">
-        <div className="flex justify-center items-center space-x-8">
-          <Triangle className="w-8 h-8 text-[#FF0B7A] animate-bounce" />
-          <Circle className="w-8 h-8 text-[#45D62E] animate-pulse" />
-          <Square className="w-8 h-8 text-[#FF0B7A] animate-spin" />
-        </div>
-      </footer>
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+      />
 
-      {/* Background animation */}
+      {/* Background animation
       <div className="top-0 left-0 z-[-1] absolute w-full h-full overflow-hidden">
         <div className="top-1/4 left-1/4 absolute bg-[#FF0B7A] opacity-20 blur-xl rounded-full w-64 h-64 animate-blob filter mix-blend-multiply"></div>
         <div className="top-3/4 right-1/4 absolute bg-[#45D62E] opacity-20 blur-xl rounded-full w-64 h-64 animate-blob animation-delay-2000 filter mix-blend-multiply"></div>
         <div className="bottom-1/4 left-1/3 absolute bg-[#FF0B7A] opacity-20 blur-xl rounded-full w-64 h-64 animate-blob animation-delay-4000 filter mix-blend-multiply"></div>
-      </div>
+      </div> */}
     </div>
   );
 }
