@@ -70,7 +70,7 @@ async function updateUrls() {
             },
           });
         } else {
-          console.warn("Invalid URL detected:", url);
+          // console.warn("Invalid URL detected:", url);
         }
       })
     );

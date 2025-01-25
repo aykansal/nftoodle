@@ -38,3 +38,7 @@ bun.lockb
 next-env.d.ts
 
 .vercel
+.vscode
+
+# next-bundler analyzer
+analyze 
