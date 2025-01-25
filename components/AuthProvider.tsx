@@ -1,7 +1,7 @@
 "use client";
-// import Link from "next/link";
 import React from "react";
 import { useActiveAccount } from "thirdweb/react";
+import { AuthorDetails } from "./Footer";
 
 export default function AuthProvider({
   children,
@@ -12,28 +12,12 @@ export default function AuthProvider({
 
   if (!account?.address) {
     return (
-      <div className="flex justify-center items-center bg-black h-[90vh] text-neutral-300">
-        <p className="font-bold text-center text-xl">
-          Oops! Looks like your wallet took a coffee break.
-          <br />
-          ☕️ Connect it to join the fun!
+      <div className="flex justify-center items-center h-[90vh] text-neutral-300">
+        <p className="flex flex-col gap-y-4 font-bold text-center text-xl">
+          <span>Oops! Looks like your wallet took a coffee break ☕️</span>
+          <span>Connect it to join the fun!</span>
         </p>
-        <footer className="bottom-4 absolute text-gray-400 text-sm">
-          Made with 💖 by
-          <span
-            // href="https://x.com/aykansal"
-            className="text-[#FF0B7A] hover:underline"
-          >
-            Us
-          </span>
-          {/* &
-          <Link
-            href="https://x.com/satyanshmittal"
-            className="text-[#FF0B7A] hover:underline"
-          >
-            Satyansh
-          </Link> */}
-        </footer>
+        <AuthorDetails className="absolute bottom-6" />
       </div>
     );
   }

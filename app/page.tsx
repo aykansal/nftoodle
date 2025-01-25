@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 
 export default function LandingPage() {
   return (
-    <div className="relative flex flex-col justify-center items-center bg-[#0A0A0A] p-8 min-h-[90vh] text-white overflow-hidden">
+    <div className="relative flex flex-col justify-center items-center p-8 min-h-[90vh] text-white overflow-hidden">
       <AnimatedGradientText className="top-5 z-10 absolute">
         <HandMetal className="mr-1 transition-transform group-hover:translate-x-0.5 duration-300 ease-in-out size-3" />
         <span
@@ -30,7 +30,7 @@ export default function LandingPage() {
         <h1 className="mb-6 font-bold text-[#FF0B7A] font-squid text-6xl md:text-7xl">
           NFT<span className="text-white">oodle</span>
         </h1>
-      <p className="mb-12 max-w-2xl text-[#45D62E] font-ibm text-xl text-center md:text-3xl">
+      <p className="mb-12 max-w-2xl text-[#45D62E] font-ibm font-ibm text-2xl text-center md:text-3xl">
           Transform NFTs into hilarious memes. Join the game, share the
           laughter!
         </p>
@@ -69,24 +69,6 @@ export default function LandingPage() {
         <Circle className="w-16 h-16 text-[#45D62E] animate-pulse" />
         <Square className="w-16 h-16 text-[#FF0B7A] animate-spin" />
       </motion.div>
-
-      <footer className="bottom-4 absolute text-gray-400 text-sm">
-        Made with 💖 by{" "}
-        <span className="text-[#FF0B7A] hover:underline">Us</span>
-        {/* <Link
-          href="https://x.com/aykansal"
-          className="text-[#FF0B7A] hover:underline"
-        >
-          Aykansal
-        </Link>
-        {" & "}
-        <Link
-          href="https://x.com/satyanshmittal"
-          className="text-[#FF0B7A] hover:underline"
-        >
-          Satyansh
-        </Link> */}
-      </footer>
 
       {/* Background shapes */}
       <div className="top-0 left-0 z-[-1] absolute w-full h-full overflow-hidden">

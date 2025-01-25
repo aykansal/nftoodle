@@ -6,6 +6,7 @@ import { ThirdwebProvider } from "thirdweb/react";
 import AuthProvider from "@/components/AuthProvider";
 import { Header } from "@/components/header";
 import { Toaster } from "@/components/ui/sonner";
+import Footer from "@/components/Footer";
 
 const squid = localFont({
   src: "./fonts/squid.woff",
@@ -16,7 +17,7 @@ const squid = localFont({
 const ibm = localFont({
   src: "./fonts/IBMPlexMono-Medium.ttf",
   weight: "100 900",
-  variable: '--font-ibm-plex-mono',
+  variable: "--font-ibm-plex-mono",
 });
 
 export const metadata: Metadata = {
@@ -31,14 +32,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${squid.variable} ${ibm.variable} antialiased`}
-        
-      >
+      <body className={`${squid.variable} ${ibm.variable} antialiased`}>
         <ThirdwebProvider>
-          <Header />
-          <AuthProvider>{children}</AuthProvider>
-          <Toaster/>
+          <div className="bg-gray-900 min-h-screen h-full w-full">
+            <Header />
+            <AuthProvider>
+              <div className="min-h-[66vh]">{children}</div>
+              <Footer />
+            </AuthProvider>
+          </div>
+          <Toaster />
         </ThirdwebProvider>
       </body>
     </html>
