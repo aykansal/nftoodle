@@ -16,3 +16,9 @@ model LastUpdate {
   id        Int      @id @default(autoincrement())
   updatedAt DateTime @default(now()) @updatedAt
 }
+model UserMemes {
+  id        Int      @id @default(autoincrement())
+  userId    String
+  memeId    String
+  createdAt DateTime @default(now())
+}

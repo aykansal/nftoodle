@@ -30,7 +30,7 @@ export default function LandingPage() {
         <h1 className="mb-6 font-bold text-[#FF0B7A] font-squid text-6xl md:text-7xl">
           NFT<span className="text-white">oodle</span>
         </h1>
-      <p className="mb-12 max-w-2xl text-[#45D62E] font-ibm text-2xl text-center md:text-3xl">
+      <p className="mb-12 max-w-2xl text-[#45D62E] font-ibm text-xl text-center md:text-3xl">
           Transform NFTs into hilarious memes. Join the game, share the
           laughter!
         </p>
