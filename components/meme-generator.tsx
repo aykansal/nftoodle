@@ -312,7 +312,6 @@ const ButtonGroup = ({
   isSaving,
   handleSave,
   saved,
-  defaultImage
 }: {
   isSaving: boolean;
   handleSave: () => void;
