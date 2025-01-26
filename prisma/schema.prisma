@@ -3,16 +3,32 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
-model imageUrls {
-  url String @id @unique
+model meme {
+  id            Int      @id @default(autoincrement())
+  cloudinaryUrl String   @unique
+  createdAt     DateTime @default(now())
+  User          User?    @relation(fields: [userAddress], references: [userWallet])
+  userAddress   String?
 }
 
 model LastUpdate {
   id        Int      @id @default(autoincrement())
   updatedAt DateTime @default(now()) @updatedAt
+}
+
+model User {
+  id         Int      @id @default(autoincrement())
+  userWallet String   @unique
+  memes      meme[]
+  createdAt  DateTime @default(now())
+}
+
+model nft {
+  id     Int    @id @default(autoincrement())
+  nftUrls String @unique
 }

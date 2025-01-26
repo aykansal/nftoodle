@@ -28,6 +28,11 @@ export interface CloudinaryUploadResponse {
   height: number;
   asset_folder: string;
   display_name: string;
+  context: {
+    custom: {
+         accountAddress: string
+    }
+},
   url: string;
   secure_url: string;
 }
@@ -103,4 +108,19 @@ export interface NFTItem {
   metadata: Metadata;
   timeLastUpdated: string;
   contractMetadata: ContractMetadata;
+}
+
+export interface CloudinaryResponse {
+  secure_url: string;
+  public_id: string;
+  version: number;
+  width: number;
+  height: number;
+  format: string;
+  created_at: string;
+  resource_type: string;
+  tags: string[];
+  bytes: number;
+  type: string;
+  url: string;
 }
