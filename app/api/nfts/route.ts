@@ -58,15 +58,15 @@ async function updateUrls() {
     }
 
     // Delete all existing image URLs
-    await prisma.imageUrls.deleteMany({});
+    await prisma.nft.deleteMany({});
 
     // Insert all URLs from the combinedUrls array
     await Promise.all(
-      combinedUrls.map(async (url) => {
-        if (url && url.includes('https://')) {
-          await prisma.imageUrls.create({
+      combinedUrls.map(async (nftUrls) => {
+        if (nftUrls && nftUrls.includes('https://')) {
+          await prisma.nft.create({
             data: {
-              url
+              nftUrls
             },
           });
         } else {
@@ -101,7 +101,7 @@ export async function GET() {
     } else {
       // Check if 24 hours have passed since the last update
       const timeDifference = new Date().getTime() - new Date(lastUpdate.updatedAt).getTime();
-      const oneDay = 24 * 60 * 60 * 1000;
+    const oneDay = 24 * 60 * 60 * 1000;
 
       if (timeDifference >= oneDay) {
         // If 24 hours have passed, update the URLs
@@ -110,10 +110,10 @@ export async function GET() {
     }
 
     // Fetch the combined URLs from the database
-    const imageUrls = await prisma.imageUrls.findMany({
-      select: { url: true },
+    const imageUrls = await prisma.nft.findMany({
+      select: { nftUrls: true },
     });
-    const combinedUrls = imageUrls.map((entry) => entry.url);
+    const combinedUrls = imageUrls.map((entry) => entry.nftUrls);
 
     return NextResponse.json(combinedUrls);
   } catch (err) {

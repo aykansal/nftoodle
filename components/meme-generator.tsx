@@ -4,10 +4,10 @@ import { useRef, useState, useEffect } from "react";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import { ImagePlus, Type, Wand2, Palette, Triangle } from "lucide-react";
+import { useActiveAccount } from "thirdweb/react";
 
 import type { MemeGeneratorProps } from "@/lib/types";
 import { squidGameVariants, tabVariants } from "@/lib/data";
-import MintNft from "@/components/thirdweb/uplaodNft";
 
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -34,10 +34,11 @@ export function MemeGenerator({ defaultImage }: MemeGeneratorProps) {
   const [imageFilter, setImageFilter] = useState("none");
   const [backgroundColor, setBackgroundColor] = useState("#000000");
   const [activeTab, setActiveTab] = useState("text");
-  const [saved, setSaved] = useState<boolean>(false);
   // const [isDownloading, setIsDownloading] = useState(false);
   // const [isSharing, setIsSharing] = useState(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
+
+  const accountAddress = useActiveAccount()?.address
 
   // Loading image
   useEffect(() => {
@@ -123,16 +124,28 @@ export function MemeGenerator({ defaultImage }: MemeGeneratorProps) {
     backgroundColor,
   ]);
 
+  // const handleDownload = async () => {
+  //   setIsDownloading(true);
+  //   const canvas = canvasRef.current;
+  //   if (!canvas) return;
+
+  //   await new Promise((resolve) => setTimeout(resolve, 800));
+
+  //   const link = document.createElement("a");
+  //   link.download = "meme.png";
+  //   link.href = canvas.toDataURL("image/png");
+  //   link.click();
+  //   setIsDownloading(false);
+  // };
   const handleSave = async () => {
     setIsSaving(true);
-    setSaved(true);
     const canvas = canvasRef.current;
     if (!canvas) return;
 
     const imageDataUrl = canvas.toDataURL("image/png");
 
     try {
-      const { status } = await axios.post("/api/memes", { imageDataUrl });
+      const { status } = await axios.post("/api/memes", { imageDataUrl, accountAddress });
       console.log(
         status === 200
           ? "Image uploaded successfully"
@@ -173,7 +186,6 @@ export function MemeGenerator({ defaultImage }: MemeGeneratorProps) {
               isSaving={isSaving}
               handleSave={handleSave}
               defaultImage={defaultImage}
-              saved={saved}
             />
           </div>
         </CardContent>
@@ -201,9 +213,9 @@ export function MemeGenerator({ defaultImage }: MemeGeneratorProps) {
             className="text-white"
             onValueChange={setActiveTab}
           >
-            <TabsList className="bg-[#1F1F1F] w-full font-ibm">
+            <TabsList className="bg-[#1F1F1F] w-full">
               {["templates", "text", "effects", "background"].map((tab) => (
-                <TabTrigger key={tab} tab={tab} activeTab={activeTab}  />
+                <TabTrigger key={tab} tab={tab} activeTab={activeTab} />
               ))}
             </TabsList>
 
@@ -267,90 +279,61 @@ export function MemeGenerator({ defaultImage }: MemeGeneratorProps) {
 }
 
 // Extracted Components (Button Group, Text Input Group, Tab Trigger, etc.)
-// const ButtonGroup = ({
-//   isSaving,
-//   handleSave,
-//   saved
-//   // defaultImage,
-// }: {
-//   isSaving: boolean;
-//   handleSave: () => void;
-//   saved: boolean;
-//   defaultImage: string;
-// }) => {
-
-//   return (
-//     <>
- 
-//       <Button
-//         onClick={handleSave}
-//         className="bg-[#FF0B7A] hover:bg-[#FF0B7A]/90 py-3 rounded-full w-full font-bold text-white transform transition-all duration-300 ease-in-out hover:scale-105"
-//         disabled={isSaving}
-//       >
-//         {isSaving ? (
-//           <motion.div
-//             animate={{ rotate: 360 }}
-//             transition={{
-//               duration: 1,
-//               repeat: Number.POSITIVE_INFINITY,
-//               ease: "linear",
-//             }}
-//           >
-//             ↻
-//           </motion.div>
-//         ) : (
-//           "Save to Gallery"
-//         )}
-//       </Button>
-
-//     </>
-//   );
-// };
-
-
 const ButtonGroup = ({
   isSaving,
   handleSave,
-  saved,
+  // defaultImage,
 }: {
   isSaving: boolean;
   handleSave: () => void;
-  saved: boolean;
   defaultImage: string;
 }) => {
+
   return (
     <>
-      {!saved ? (
-        <Button
-          onClick={handleSave}
-          className="bg-[#FF0B7A] hover:bg-[#FF0B7A]/90 py-3 rounded-full w-full font-bold text-white transform transition-all duration-300 ease-in-out hover:scale-105"
-          disabled={isSaving}
+      {/* <Button
+      onClick={handleShare}
+      className="bg-[#FF0B7A] hover:bg-[#FF0B7A]/90 py-3 rounded-full w-full font-bold text-white transform transition-all duration-300 ease-in-out hover:scale-105"
+      disabled={isSharing}
+    >
+      {isSharing ? (
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{
+            duration: 1,
+            repeat: Number.POSITIVE_INFINITY,
+            ease: "linear",
+          }}
         >
-          {isSaving ? (
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{
-                duration: 1,
-                repeat: Number.POSITIVE_INFINITY,
-                ease: "linear",
-              }}
-            >
-              ↻
-            </motion.div>
-          ) : (
-            "Save to Gallery"
-          )}
-        </Button>
+          ↻
+        </motion.div>
       ) : (
-        <MintNft image={"someimage"} name={"somename"} description={"somedescription"}/>
+        "Share on X"
       )}
-        <MintNft image={"someimage"} name={"somename"} description={"somedescription"}/>
-
+    </Button> */}
+      <Button
+        onClick={handleSave}
+        className="bg-[#FF0B7A] hover:bg-[#FF0B7A]/90 py-3 rounded-full w-full font-bold text-white transform transition-all duration-300 ease-in-out hover:scale-105"
+        disabled={isSaving}
+      >
+        {isSaving ? (
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{
+              duration: 1,
+              repeat: Number.POSITIVE_INFINITY,
+              ease: "linear",
+            }}
+          >
+            ↻
+          </motion.div>
+        ) : (
+          "Save to Gallery"
+        )}
+      </Button>
     </>
-
   );
 };
-
 
 const TextInputGroup = ({
   topText,
@@ -367,7 +350,7 @@ const TextInputGroup = ({
   fontSize: number;
   setFontSize: (value: number) => void;
 }) => (
-  <div className="space-y-4 font-ibm">
+  <div className="space-y-4">
     <Input
       type="text"
       value={topText}
@@ -383,7 +366,7 @@ const TextInputGroup = ({
       placeholder="Bottom Text"
     />
     <div className="flex items-center space-x-2">
-      <Label className="font-medium text-sm text-white font-ibm">Font Size:</Label>
+      <Label className="font-medium text-sm text-white">Font Size:</Label>
       <Slider
         value={[fontSize]}
         onValueChange={(value) => setFontSize(value[0])}
@@ -427,26 +410,26 @@ const TextControl = ({
   textColor: string;
   textEffect: string;
 }) => (
-  <div className="space-y-4 font-ibm">
-    <div className="font-ibm">
-      <Label className="block mb-2 text-[#FF0B7A] font-ibm">Text Color</Label>
+  <div className="space-y-4">
+    <div>
+      <Label className="block mb-2 text-[#FF0B7A]">Text Color</Label>
       <div className="flex items-center space-x-2">
         <Input
           type="color"
           value={textColor}
           onChange={(e) => setTextColor(e.target.value)}
-          className="border-[#FF0B7A] font-ibm p-1 border rounded w-12 h-12"
+          className="border-[#FF0B7A] p-1 border rounded w-12 h-12"
         />
         <Input
           type="text"
           value={textColor}
           onChange={(e) => setTextColor(e.target.value)}
-          className="flex-grow border-[#FF0B7A] bg-black p-2 border rounded-lg font-ibm text-white"
+          className="flex-grow border-[#FF0B7A] bg-black p-2 border rounded-lg text-white"
         />
       </div>
     </div>
     <div>
-      <Label className="block mb-2 font-ibm text-[#FF0B7A]" >Text Effect</Label>
+      <Label className="block mb-2 text-[#FF0B7A]">Text Effect</Label>
       <Select
         value={textEffect}
         onValueChange={(value) => setTextEffect(value)}
@@ -454,9 +437,9 @@ const TextControl = ({
         <SelectTrigger className="border-[#FF0B7A] bg-black border w-full text-white">
           <SelectValue placeholder="Select Text Effect" />
         </SelectTrigger>
-        <SelectContent className="font-ibm">
-          <SelectItem value="none" className="font-ibm" >None</SelectItem>
-          <SelectItem value="shadow" className="font-ibm">Shadow</SelectItem>
+        <SelectContent>
+          <SelectItem value="none">None</SelectItem>
+          <SelectItem value="shadow">Shadow</SelectItem>
         </SelectContent>
       </Select>
     </div>
@@ -514,4 +497,3 @@ const BackgroundControl = ({
     </div>
   </div>
 );
-
