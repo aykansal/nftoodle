@@ -8,15 +8,19 @@ import { motion } from "framer-motion";
 
 import { Card, CardContent } from "@/components/ui/card";
 import axios from "axios";
-import { CloudinaryUploadResponse } from "@/lib/types";
 import XShareButton from "@/components/XShareBtn";
 import usePagination from "@/hooks/usePagination";
 import { Pagination } from "@/components/ui/pagination";
 import Loader from "@/components/loader";
 
+interface memes {
+  cloudinaryUrl : string;
+  id: number;
+}
+
 export default function Showcase() {
   const [hoveredMeme, setHoveredMeme] = useState<number | null>(null);
-  const [memes, setMemes] = useState<CloudinaryUploadResponse[]>([]);
+  const [memes, setMemes] = useState<memes[]>([]);
   const [isFetching, setIsFetching] = useState<boolean>(true);
   const { currentItems, currentPage, totalPages, handlePageChange } =
     usePagination({
@@ -29,7 +33,7 @@ export default function Showcase() {
       try {
         setIsFetching(true);
         const response = await axios.get("/api/memes");
-        const data = await response.data;
+        const data = response.data;
         setMemes(data);
       } catch (error) {
         console.error("Error fetching memes:", error);
@@ -41,13 +45,14 @@ export default function Showcase() {
     fetchMemes();
   }, []);
 
+
   return (
     <div className="p-8 min-h-full text-white">
       <header className="mb-12 text-center">
         <h1 className="mb-4 font-bold text-4xl text-pink-500">
           Squid Meme Showcase
         </h1>
-        <p className="text-green-400 text-xl">
+        <p className="text-green-400 text-xl font-ibm">
           Discover and Enjoy Squid Game-Inspired Memes!
         </p>
       </header>
@@ -57,23 +62,23 @@ export default function Showcase() {
       ) : (
         <>
           <div className="gap-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-            {currentItems?.map((meme, index) => (
+            {currentItems?.map((meme) => (
               <motion.div
-                key={index}
+                key={meme.id}
                 whileHover={{ scale: 1.05 }}
-                onHoverStart={() => setHoveredMeme(index)}
+                onHoverStart={() => setHoveredMeme(meme.id)}
                 onHoverEnd={() => setHoveredMeme(null)}
               >
                 <Card className="border-2 border-pink-500 bg-gray-800 overflow-hidden">
                   <CardContent className="relative p-0">
                     <Image
-                      src={meme.url}
-                      alt={meme.display_name}
+                      src={meme.cloudinaryUrl}
+                      alt={meme.cloudinaryUrl}
                       width={200}
                       height={200}
                       className="w-full h-auto object-cover"
                     />
-                    {hoveredMeme === index && (
+                    {hoveredMeme === meme.id && (
                       <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
@@ -81,7 +86,7 @@ export default function Showcase() {
                       >
                         <p className="font-bold text-lg text-white">
                           {/* {meme.display_name} */}
-                          <XShareButton imageUrl={meme.secure_url} />
+                          <XShareButton imageUrl={meme.cloudinaryUrl} />
                         </p>
                       </motion.div>
                     )}

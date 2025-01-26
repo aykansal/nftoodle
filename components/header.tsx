@@ -7,6 +7,7 @@ export function Header() {
   const navItems = [
     { name: "Create", href: "/create" },
     { name: "Gallery", href: "/gallery" },
+    { name: "MyMemes", href: "/my-memes" },
     // { name: "Profile", href: "/profile" },
     { name: "GameZone", href: "/gamecenter" },
   ];
@@ -29,7 +30,7 @@ export function Header() {
               href={item.href}
               className="relative text-white hover:text-[#FF0B7A] transition-colors duration-200 ease-in-out group"
             >
-              <span className="relative text-2xl mt-2 font-ibm z-10">
+              <span className="relative text-2xl mt-20 font-ibm z-10">
                 {item.name}
               </span>
               <motion.div

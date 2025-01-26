@@ -98,7 +98,7 @@ export default function CreatePage() {
         <h1 className="mb-3 font-bold text-[#FF0B7A] text-5xl">
           Select an NFT to Memeify
         </h1>
-        <p className="text-[#45D62E] font-ibm text-xl font-ibm">
+        <p className="text-[#45D62E] font-ibm text-xl ">
           Choose your favorite NFT and turn it into a hilarious meme!
         </p>
       </motion.div>
