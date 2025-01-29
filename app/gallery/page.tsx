@@ -28,6 +28,8 @@ export default function Showcase() {
       itemsPerPage: 9,
     });
 
+    
+
   React.useEffect(() => {
     const fetchMemes = async () => {
       try {
@@ -55,6 +57,7 @@ export default function Showcase() {
         <p className="text-green-400 text-xl font-ibm">
           Discover and Enjoy Squid Game-Inspired Memes!
         </p>
+        <div></div>
       </header>
 
       {isFetching ? (

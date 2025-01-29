@@ -6,30 +6,45 @@ import { Button } from '@/components/ui/button'
 import { motion } from "framer-motion"
 import { Card, CardContent } from "@/components/ui/card"
 import { Triangle, Circle, Square } from "lucide-react"
+import { useActiveAccount } from 'thirdweb/react'
+
 
 interface Meme {
   id: string
-  imageUrl: string
+  cloudinaryUrl: string
   isMinted: boolean
 }
 
 export default function MyMemes() {
   const [memes, setMemes] = useState<Meme[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const account = useActiveAccount()?.address
 
+console.log(account)
   useEffect(() => {
-    // TODO: Replace with actual API call to fetch user's memes
     const fetchMemes = async () => {
       try {
-        // Simulate API call
-        const dummyMemes: Meme[] = [
-          { id: '1', imageUrl: '/dummy-meme-1.jpg', isMinted: false },
-          { id: '2', imageUrl: '/dummy-meme-2.jpg', isMinted: false },
-          // Add more dummy memes as needed
-        ]
-        setMemes(dummyMemes)
+        const response = await fetch('/api/profile?address=' + account)
+        const data = await response.json()
+        console.log(data)
+        if (!response.ok) {
+          throw new Error('Failed to fetch memes')
+        }
+
+        console.log(data.memes[0].cloudinaryUrl)
+        setMemes(data.memes)
+
+
+        // if (Array.isArray(data.memes)) {
+        //   setMemes(data.memes)
+        //   console.log('Memes fetched successfully:', data.menes[0])
+        // } else {
+        //   console.error('Invalid memes data format:', data)
+        //   setMemes([])
+        // }
       } catch (error) {
         console.error('Error fetching memes:', error)
+        setMemes([])
       } finally {
         setIsLoading(false)
       }
@@ -120,7 +135,7 @@ export default function MyMemes() {
                 <CardContent className="relative p-0">
                   <div className="relative aspect-square w-full overflow-hidden group">
                     <Image
-                      src={meme.imageUrl}
+                      src={meme.cloudinaryUrl}
                       alt="Generated Meme"
                       fill
                       className="object-cover transition-transform duration-300 group-hover:scale-110"

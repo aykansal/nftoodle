@@ -32,3 +32,4 @@ model nft {
   id     Int    @id @default(autoincrement())
   nftUrls String @unique
 }
+
