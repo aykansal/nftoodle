@@ -6,6 +6,7 @@ interface UsePaginationProps<T> {
 }
 
 export default function usePagination<T>({ items, itemsPerPage }: UsePaginationProps<T>) {
+  
   const [currentPage, setCurrentPage] = useState(1);
   
   const totalPages = Math.ceil(items.length / itemsPerPage);
