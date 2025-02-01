@@ -2,17 +2,17 @@
 
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
-import { Button } from '@/components/ui/button'
 import { motion } from "framer-motion"
 import { Card, CardContent } from "@/components/ui/card"
 import { Triangle, Circle, Square } from "lucide-react"
 import { useActiveAccount } from 'thirdweb/react'
+import MintNft from "@/components/thirdweb/uplaodNft"
 
 
 interface Meme {
   id: string
   cloudinaryUrl: string
-  isMinted: boolean
+  minted: boolean
 }
 
 export default function MyMemes() {
@@ -31,17 +31,9 @@ console.log(account)
           throw new Error('Failed to fetch memes')
         }
 
-        console.log(data.memes[0].cloudinaryUrl)
+        console.log(data.memes[0].minted)
         setMemes(data.memes)
 
-
-        // if (Array.isArray(data.memes)) {
-        //   setMemes(data.memes)
-        //   console.log('Memes fetched successfully:', data.menes[0])
-        // } else {
-        //   console.error('Invalid memes data format:', data)
-        //   setMemes([])
-        // }
       } catch (error) {
         console.error('Error fetching memes:', error)
         setMemes([])
@@ -53,20 +45,20 @@ console.log(account)
     fetchMemes()
   }, [])
 
-  const handleMintNFT = async (memeId: string) => {
-    try {
-      // TODO: Implement NFT minting logic
-      console.log(`Minting meme ${memeId} as NFT...`)
-      // Update meme status after successful minting
-      setMemes(prevMemes =>
-        prevMemes.map(meme =>
-          meme.id === memeId ? { ...meme, isMinted: true } : meme
-        )
-      )
-    } catch (error) {
-      console.error('Error minting NFT:', error)
-    }
-  }
+  // const handleMintNFT = async (memeId: string) => {
+  //   try {
+  //     // TODO: Implement NFT minting logic
+  //     console.log(`Minting meme ${memeId} as NFT...`)
+  //     // Update meme status after successful minting
+  //     setMemes(prevMemes =>
+  //       prevMemes.map(meme =>
+  //         meme.id === memeId ? { ...meme, isMinted: true } : meme
+  //       )
+  //     )
+  //   } catch (error) {
+  //     console.error('Error minting NFT:', error)
+  //   }
+  // }
 
   if (isLoading) {
     return (
@@ -142,21 +134,21 @@ console.log(account)
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-gray-900/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   </div>
+                  
                   <motion.div 
                     className="p-4"
                     whileHover={{ backgroundColor: 'rgba(0,0,0,0.1)' }}
                   >
-                    <Button
-                      onClick={() => handleMintNFT(meme.id)}
-                      disabled={meme.isMinted}
+                    {/* <Button
                       className={`w-full transition-all duration-300 ${
                         meme.isMinted 
                           ? 'bg-gray-700 text-green-400 hover:bg-gray-600'
                           : 'bg-pink-500 hover:bg-pink-600 text-white hover:shadow-lg hover:shadow-pink-500/30'
                       }`}
-                    >
-                      {meme.isMinted ? '✨ Minted ✨' : 'Mint as NFT'}
-                    </Button>
+                    > */}
+                      {/* {meme.isMinted ? '✨ Minted ✨' : 'Mint as NFT'} */}
+                      <MintNft name={'NFT Meme'} description={`This meme is minted by ${account}`} image={meme.cloudinaryUrl} minted={meme.minted} />
+                    {/* </Button> */}
                   </motion.div>
                 </CardContent>
               </Card>
@@ -173,6 +165,7 @@ console.log(account)
           className="mb-4 text-green-400 text-lg hover:text-green-300 transition-colors"
         >
           Mint your favorite memes as NFTs!
+          {/* <MintNft name={'NFT Meme'} description={`This meme is minted by ${account} /> */}
         </motion.p>
         <motion.div 
           initial={{ opacity: 0, y: 20 }}

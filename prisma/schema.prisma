@@ -12,6 +12,7 @@ model meme {
   id            Int      @id @default(autoincrement())
   cloudinaryUrl String   @unique
   createdAt     DateTime @default(now())
+  minted        Boolean? @default(false)
   User          User?    @relation(fields: [userAddress], references: [userWallet])
   userAddress   String?
 }
@@ -29,7 +30,6 @@ model User {
 }
 
 model nft {
-  id     Int    @id @default(autoincrement())
+  id      Int    @id @default(autoincrement())
   nftUrls String @unique
 }
-

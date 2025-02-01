@@ -1,3 +1,4 @@
+
 "use client";
 
 import { main } from "@/app/api/mint-nft/get";
@@ -13,7 +14,6 @@ import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import {
   Tooltip,
-  TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
@@ -23,11 +23,10 @@ const CONTRACT_ADDRESS = "0xaC434dc0061aD90B45415e92b160D7Bbaa21F5db";
 const CHAIN_ID = 656476;
 const CLIENT_ID = "aa99b0e9769d2262d120e7aec4ec7a94";
 
-export default function Home({ name, description, image }) {
+export default function Home({ name, description, image, minted }) {
   const [minting, setMinting] = useState(false);
   const [isMintedOnce, setIsMintedOnce] = useState(false);
   const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
@@ -41,8 +40,8 @@ export default function Home({ name, description, image }) {
  
 
   useEffect(() => {
-    const mintStatus = localStorage.getItem("mintStatus");
-    setIsMintedOnce(mintStatus === "true");
+    
+    
 
     if (image) {
       const img = new Image();
@@ -78,9 +77,33 @@ export default function Home({ name, description, image }) {
       return;
     }
 
+    try {
+      const response = await fetch('/api/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          address: wallet,
+          hasMinted: true,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update mint status');
+      }
+
+      const data = await response.json();
+      console.log('Mint status updated:', data);
+    } catch (error) {
+      
+
     setMinting(true);
     setError(null);
     setSuccess(false);
+
+    handleError(error, `Failed to update mint status: ${error.message}`);
+    }
 
     try {
       const { payload, signature } = await main(
@@ -110,7 +133,6 @@ export default function Home({ name, description, image }) {
       });
 
       console.log("Mint successful:", mintResponse);
-      localStorage.setItem("mintStatus", "true");
       setIsMintedOnce(true);
       setSuccess(true);
       setShowTooltip(true);
@@ -128,11 +150,11 @@ export default function Home({ name, description, image }) {
     }
   }
 
-  const buttonText = minting 
-    ? "Minting..." 
-    : isMintedOnce 
-    ? "Already Minted" 
-    : "Mint";
+  // const buttonText = minting 
+  //   ? "Minting..." 
+  //   : isMintedOnce 
+  //   ? "Already Minted" 
+  //   : "Mint";
 
   if (isLoading) {
     return (
@@ -151,11 +173,11 @@ export default function Home({ name, description, image }) {
         </Alert>
       )}
 
-      {success && (
+      {/* {success && (
         <Alert>
           <AlertDescription>NFT successfully minted!</AlertDescription>
         </Alert>
-      )}
+      )} */}
 
       {imageLoaded && (
         <>
@@ -171,23 +193,28 @@ export default function Home({ name, description, image }) {
             <Tooltip open={isMintedOnce && showTooltip}>
               <TooltipTrigger asChild>
                 <div className="w-full font-ibm">
-                  <Button className="bg-[#FF0B7A] hover:bg-[#FF0B7A]/90 py-3 rounded-full w-full font-bold text-white transform transition-all duration-300 ease-in-out hover:scale-105"
-                    disabled={minting || isMintedOnce || !!error} 
-                    onClick={mint}
-                    onMouseEnter={() => isMintedOnce && setShowTooltip(true)}
-                    onMouseLeave={() => setShowTooltip(false)}
-                  >
-                    {buttonText}
-                  </Button>
+
+                  {(minted || isMintedOnce) ? <Button className="bg-green-700 hover:bg-green/90 py-3 rounded-full w-full font-bold text-white transform transition-all duration-300 ease-in-out hover:scale-105"
+                    
+
+                  > Already Minted </Button>
+                  : <Button className="bg-[#FF0B7A] hover:bg-[#FF0B7A]/90 py-3 rounded-full w-full font-bold text-white transform transition-all duration-300 ease-in-out hover:scale-105"
+                  disabled={minting || isMintedOnce || !!error} 
+                  onClick={mint}
+
+                >
+                  {minting ? "Minting...": "Mint"}
+                </Button> }
+                  
                 </div>
               </TooltipTrigger>
-              <TooltipContent 
+              {/* <TooltipContent 
                 side="top"
                 className="z-50 bg-black shadow-lg p-2 rounded text-white"
                 sideOffset={5}
               >
                 <p>NFT already added to your Wallet. You can mint next after 3 hrs</p>
-              </TooltipContent>
+              </TooltipContent> */}
             </Tooltip>
           </TooltipProvider>
         </>
