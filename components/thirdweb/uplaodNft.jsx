@@ -133,7 +133,9 @@ export default function Home({ name, description, image, minted }) {
       });
 
       console.log("Mint successful:", mintResponse);
+      if (mintResponse) {
       setIsMintedOnce(true);
+      }
       setSuccess(true);
       setShowTooltip(true);
 
@@ -167,11 +169,6 @@ export default function Home({ name, description, image, minted }) {
 
   return (
     <div className="space-y-4">
-      {error && (
-        <Alert variant="destructive">
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
 
       {/* {success && (
         <Alert>
