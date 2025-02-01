@@ -17,7 +17,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+// import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const CONTRACT_ADDRESS = "0xaC434dc0061aD90B45415e92b160D7Bbaa21F5db";
 const CHAIN_ID = 656476;
