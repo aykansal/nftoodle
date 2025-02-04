@@ -144,7 +144,8 @@ export default function MyMemes() {
                       isMinting={currentlyMinting !== null}
                       isCurrentMinting={currentlyMinting === meme.id}
                       onMintStart={() => handleMintStart(meme.id)}
-                      onMintComplete={(success:any) => handleMintComplete(meme.id, success)}
+                      // @ts-expect-error ignore
+                      onMintComplete={(success) => handleMintComplete(meme.id, success)}
                     />
                   </motion.div>
                 </CardContent>

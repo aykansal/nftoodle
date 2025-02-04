@@ -67,10 +67,9 @@ export async function PUT(request: Request) {
       success: true, 
       updatedMeme 
     }, { status: 200 });
-  } catch (error:any) {
+  } catch (error) {
     console.error("Error updating meme:", error);
-    
-    // Provide more specific error messages
+    // @ts-expect-error ignore    
     if (error.code === 'P2025') {
       return NextResponse.json({ 
         error: "Meme not found or doesn't belong to the user" 
