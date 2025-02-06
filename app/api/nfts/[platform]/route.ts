@@ -1,11 +1,11 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
 import { tokenList } from '@/lib/types';
 import { fetchOpenSeaCollection, getDistinctValues } from '@/lib/utils';
 import { fetchBazarTokens } from '@/hooks/fetch';
 
 export async function GET(
-  request: Request,
+  request: NextRequest,
   { params }: { params: { platform: string } }
 ) {
   const { platform } = params;
