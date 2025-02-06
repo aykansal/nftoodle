@@ -1,6 +1,6 @@
-import { Circle, Square, Triangle } from "lucide-react";
+import { Circle, Square, Triangle } from 'lucide-react';
 
-export default function Loader ()  {
+export default function Loader() {
   return (
     <div className="min-h-full flex justify-center items-center space-x-4">
       <Triangle className="w-12 h-12 text-[#FF0B7A] animate-bounce" />
@@ -8,4 +8,4 @@ export default function Loader ()  {
       <Square className="w-12 h-12 text-[#FF0B7A] animate-spin" />
     </div>
   );
-};
+}

@@ -4,7 +4,11 @@ interface PaginationProps {
   onPageChange: (page: number) => void;
 }
 
-export function Pagination({ currentPage, totalPages, onPageChange }: PaginationProps) {
+export function Pagination({
+  currentPage,
+  totalPages,
+  onPageChange,
+}: PaginationProps) {
   return (
     <div className="flex justify-center space-x-4 mt-8">
       <button
@@ -24,4 +28,4 @@ export function Pagination({ currentPage, totalPages, onPageChange }: Pagination
       </button>
     </div>
   );
-} 
+}

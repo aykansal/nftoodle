@@ -1,10 +1,10 @@
-import { createWallet } from "thirdweb/wallets";
+import { createWallet } from 'thirdweb/wallets';
 
-import { createThirdwebClient } from "thirdweb";
+import { createThirdwebClient } from 'thirdweb';
 
-const clientKey = process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID
+const clientKey = process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID;
 export const client = createThirdwebClient({
-    clientId: `${clientKey}`,
+  clientId: `${clientKey}`,
 });
 
-export const wallet = createWallet("io.metamask");
+export const wallet = createWallet('io.metamask');

@@ -21,6 +21,15 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "components/thirdweb/ConnectWallet.jsx", "app/default.js", "app/[...not_found]/page.ts"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "components/thirdweb/ConnectWallet.tsx",
+    "app/default.js",
+    "app/[...not_found]/page.ts",
+    "hooks/fetch.js"
+  ],
   "exclude": ["node_modules"]
 }

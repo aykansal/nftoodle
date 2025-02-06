@@ -1,0 +1,114 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'SquidGame';
+  src: url('/fonts/GameOfSquids.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 346.8 100% 50.4%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 14.9%;
+    --muted-foreground: 0 0% 63.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 346.8 100% 50.4%;
+    --radius: 0.75rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border font-ibm;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings:
+      'rlig' 1,
+      'calt' 1;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-squid text-[#FF0B7A];
+  }
+}
+
+@layer components {
+  .squid-button {
+    @apply relative overflow-hidden transition-all duration-300 
+           bg-gradient-to-r from-[#FF0B7A] to-[#FF0B7A]/80
+           hover:from-[#FF0B7A]/90 hover:to-[#FF0B7A]/70
+           text-white font-squid tracking-wider
+           shadow-[0_0_10px_rgba(255,11,122,0.3)]
+           hover:shadow-[0_0_20px_rgba(255,11,122,0.5)]
+           active:scale-95;
+  }
+
+  .squid-card {
+    @apply relative overflow-hidden bg-black/50 backdrop-blur-sm
+           border-2 border-[#FF0B7A]/30 rounded-xl
+           transition-all duration-300
+           hover:border-[#FF0B7A]
+           hover:shadow-[0_0_30px_rgba(255,11,122,0.2)];
+  }
+
+  .squid-input {
+    @apply bg-black/50 border-2 border-[#FF0B7A]/30
+           focus:border-[#FF0B7A] focus:ring-[#FF0B7A]/20
+           text-white placeholder-gray-400
+           transition-all duration-300;
+  }
+
+  .glow-effect {
+    animation: glow 2s infinite;
+  }
+
+  .pulse-effect {
+    animation: pulse 2s infinite;
+  }
+}
+
+@keyframes glow {
+  0% {
+    box-shadow: 0 0 5px rgba(255, 11, 122, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(255, 11, 122, 0.8);
+  }
+  100% {
+    box-shadow: 0 0 5px rgba(255, 11, 122, 0.5);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}

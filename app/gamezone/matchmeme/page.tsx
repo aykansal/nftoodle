@@ -1,15 +1,15 @@
-"use client";
-import React, { useState, useEffect } from "react";
-import { default as Img } from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
-import axios from "axios";
-import type { CloudinaryUploadResponse } from "@/lib/types";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import Loader from "@/components/loader";
-import { useRouter } from "next/navigation";
-import { Home, RefreshCcw} from "lucide-react";
-import { Modal } from "@/components/ui/modal";
+'use client';
+import React, { useState, useEffect } from 'react';
+import { default as Img } from 'next/image';
+import { motion, AnimatePresence } from 'framer-motion';
+import axios from 'axios';
+import type { CloudinaryUploadResponse } from '@/lib/types';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import Loader from '@/components/loader';
+import { useRouter } from 'next/navigation';
+import { Home, RefreshCcw } from 'lucide-react';
+import { Modal } from '@/components/ui/modal';
 
 type GameCard = {
   id: number;
@@ -40,12 +40,12 @@ export default function Matchmeme() {
   useEffect(() => {
     const fetchMemes = async () => {
       try {
-        const response = await axios.get("/api/memes");
+        const response = await axios.get('/api/memes');
         setMemes(response.data);
         // Start preloading images as soon as we get the meme data
         preloadImages(response.data);
       } catch (error) {
-        console.error("Error fetching memes:", error);
+        console.error('Error fetching memes:', error);
       } finally {
         setLoading(false);
       }
@@ -152,14 +152,14 @@ export default function Matchmeme() {
       const finalScore = Math.max(0, score - moves * 5);
       if (finalScore > bestScore) {
         setBestScore(finalScore);
-        localStorage.setItem("memeGameBestScore", finalScore.toString());
+        localStorage.setItem('memeGameBestScore', finalScore.toString());
       }
     }
   }, [matchedPairs, score, moves, bestScore]);
 
   // Load best score from localStorage
   useEffect(() => {
-    const savedBestScore = localStorage.getItem("memeGameBestScore");
+    const savedBestScore = localStorage.getItem('memeGameBestScore');
     if (savedBestScore) {
       setBestScore(parseInt(savedBestScore));
     }
@@ -184,7 +184,7 @@ export default function Matchmeme() {
 
   // Handle return to home
   const handleReturnHome = () => {
-    router.push("/");
+    router.push('/');
   };
 
   if (loading) {
@@ -217,10 +217,10 @@ export default function Matchmeme() {
               disabled={!imagesLoaded}
             >
               {!imagesLoaded
-                ? "Loading Images..."
+                ? 'Loading Images...'
                 : gameStarted
-                ? "Restart Game"
-                : "Start Game"}
+                  ? 'Restart Game'
+                  : 'Start Game'}
             </Button>
             {gameStarted && (
               <Button
@@ -248,7 +248,7 @@ export default function Matchmeme() {
                 >
                   <Card
                     className={`w-full h-full bg-[#1A1A1A] cursor-pointer transition-all duration-500 ${
-                      card.isMatched ? "opacity-60" : ""
+                      card.isMatched ? 'opacity-60' : ''
                     }`}
                     onClick={() => handleCardClick(card.id)}
                   >
@@ -256,8 +256,8 @@ export default function Matchmeme() {
                       <div
                         className={`w-full h-full transition-all duration-500 transform ${
                           flippedCards.includes(card.id) || card.isMatched
-                            ? "rotate-y-0"
-                            : "rotate-y-180"
+                            ? 'rotate-y-0'
+                            : 'rotate-y-180'
                         }`}
                       >
                         {flippedCards.includes(card.id) || card.isMatched ? (
@@ -295,7 +295,7 @@ export default function Matchmeme() {
               🎉 Congratulations! 🎉
             </h2>
             <p className="text-lg">
-              You completed the game in {moves} moves with a score of{" "}
+              You completed the game in {moves} moves with a score of{' '}
               {Math.max(0, score - moves * 5)}!
             </p>
           </motion.div>
@@ -345,7 +345,9 @@ export default function Matchmeme() {
               </div>
               <div>
                 <p className="text-[#FF0B7A]">Final Score</p>
-                <p className="text-2xl font-bold">{Math.max(0, score - moves * 5)}</p>
+                <p className="text-2xl font-bold">
+                  {Math.max(0, score - moves * 5)}
+                </p>
               </div>
               <div>
                 <p className="text-[#FF0B7A]">Best Score</p>

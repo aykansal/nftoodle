@@ -1,36 +1,36 @@
 // app/create/[nftId]/page.tsx
 
-"use client"
-import { useSearchParams } from "next/navigation"
-import { Suspense, useEffect, useState } from "react"
-import { MemeGenerator } from "@/components/meme-generator"
-import { motion, AnimatePresence } from "framer-motion"
-import { Triangle, Circle, Square } from "lucide-react"
+'use client';
+import { useSearchParams } from 'next/navigation';
+import { Suspense, useEffect, useState } from 'react';
+import { MemeGenerator } from '@/components/meme-generator';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Triangle, Circle, Square } from 'lucide-react';
 // import { uploadToCloudinary } from "@/lib/cloudinary";  // Import the upload function
 // import { prisma } from "@/lib/prisma";
 
 export default function Page() {
-  const [isMounted, setIsMounted] = useState(false)
-  const [imageUrl, setImageUrl] = useState<string>("")
-  const searchParams = useSearchParams()
+  const [isMounted, setIsMounted] = useState(false);
+  const [imageUrl, setImageUrl] = useState<string>('');
+  const searchParams = useSearchParams();
   // const [isUploading, setIsUploading] = useState(false);
   // const [memeImageUrl, setMemeImageUrl] = useState("");
 
   useEffect(() => {
-    setIsMounted(true)
-  }, [])
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     if (isMounted) {
-      const urlParam = searchParams.get("imageUrl")
+      const urlParam = searchParams.get('imageUrl');
       if (urlParam) {
-        setImageUrl(decodeURIComponent(urlParam))
+        setImageUrl(decodeURIComponent(urlParam));
       }
     }
-  }, [isMounted, searchParams])
+  }, [isMounted, searchParams]);
 
   return (
-    <div className="relative bg-[#0A0A0A] min-h-[90vh] text-white overflow-hidden">
+    <div className="relative min-h-[90vh] text-white overflow-hidden">
       <AnimatePresence>
         {!isMounted && (
           <motion.div
@@ -41,7 +41,11 @@ export default function Page() {
             <motion.div
               animate={{
                 rotate: [0, 360],
-                transition: { duration: 2, repeat: Number.POSITIVE_INFINITY, ease: "linear" },
+                transition: {
+                  duration: 2,
+                  repeat: Number.POSITIVE_INFINITY,
+                  ease: 'linear',
+                },
               }}
               className="flex justify-center items-center space-x-4 mb-4"
             >
@@ -95,7 +99,7 @@ export default function Page() {
         <div className="bottom-1/4 left-1/3 absolute bg-[#FF0B7A] opacity-20 blur-xl rounded-full w-64 h-64 animate-blob animation-delay-4000 filter mix-blend-multiply"></div>
       </div>
     </div>
-  )
+  );
 }
 
 // old code

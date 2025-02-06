@@ -1,15 +1,15 @@
-"use client";
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import Image from "next/image";
-import axios from "axios";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import Loader from "@/components/loader";
-import { Swords, Shield, Zap, Home, RefreshCcw } from "lucide-react";
-import { useRouter } from "next/navigation";
-import type { CloudinaryUploadResponse } from "@/lib/types";
-import { Modal } from "@/components/ui/modal";
+'use client';
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
+import axios from 'axios';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import Loader from '@/components/loader';
+import { Swords, Shield, Zap, Home, RefreshCcw } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import type { CloudinaryUploadResponse } from '@/lib/types';
+import { Modal } from '@/components/ui/modal';
 
 interface MemeCard {
   id: number;
@@ -31,8 +31,10 @@ export default function CardGame() {
   const [computerScore, setComputerScore] = useState(0);
   const [loading, setLoading] = useState(true);
   const [gameStarted, setGameStarted] = useState(false);
-  const [battleResult, setBattleResult] = useState<string>("");
-  const [roundWinner, setRoundWinner] = useState<"player" | "computer" | null>(null);
+  const [battleResult, setBattleResult] = useState<string>('');
+  const [roundWinner, setRoundWinner] = useState<'player' | 'computer' | null>(
+    null
+  );
   const [showEndGameModal, setShowEndGameModal] = useState(false);
   const [showGameSummaryModal, setShowGameSummaryModal] = useState(false);
   const [gameOver, setGameOver] = useState(false);
@@ -40,11 +42,11 @@ export default function CardGame() {
   useEffect(() => {
     const fetchMemes = async () => {
       try {
-        const response = await axios.get("/api/memes");
+        const response = await axios.get('/api/memes');
         setMemes(response.data);
         setLoading(false);
       } catch (error) {
-        console.error("Error fetching memes:", error);
+        console.error('Error fetching memes:', error);
         setLoading(false);
       }
     };
@@ -77,34 +79,41 @@ export default function CardGame() {
     setPlayerScore(0);
     setComputerScore(0);
     setGameStarted(true);
-    setBattleResult("");
+    setBattleResult('');
     setRoundWinner(null);
   };
 
   const handleCardSelect = (card: MemeCard) => {
     if (card.isPlayed) return;
     setSelectedCard(card);
-    
+
     // Computer selects a random unplayed card
-    const availableComputerCards = computerCards.filter(c => !c.isPlayed);
-    const randomCard = availableComputerCards[Math.floor(Math.random() * availableComputerCards.length)];
+    const availableComputerCards = computerCards.filter((c) => !c.isPlayed);
+    const randomCard =
+      availableComputerCards[
+        Math.floor(Math.random() * availableComputerCards.length)
+      ];
     setComputerCard(randomCard);
 
     // Battle logic
     const battleScore = calculateBattleScore(card, randomCard);
-    
+
     // Update scores and mark cards as played
-    setPlayerCards(prev => prev.map(c => c.id === card.id ? { ...c, isPlayed: true } : c));
-    setComputerCards(prev => prev.map(c => c.id === randomCard.id ? { ...c, isPlayed: true } : c));
+    setPlayerCards((prev) =>
+      prev.map((c) => (c.id === card.id ? { ...c, isPlayed: true } : c))
+    );
+    setComputerCards((prev) =>
+      prev.map((c) => (c.id === randomCard.id ? { ...c, isPlayed: true } : c))
+    );
 
     if (battleScore > 0) {
-      setPlayerScore(prev => prev + 1);
-      setRoundWinner("player");
-      setBattleResult("You win this round!");
+      setPlayerScore((prev) => prev + 1);
+      setRoundWinner('player');
+      setBattleResult('You win this round!');
     } else if (battleScore < 0) {
-      setComputerScore(prev => prev + 1);
-      setRoundWinner("computer");
-      setBattleResult("Computer wins this round!");
+      setComputerScore((prev) => prev + 1);
+      setRoundWinner('computer');
+      setBattleResult('Computer wins this round!');
     } else {
       setBattleResult("It's a tie!");
       setRoundWinner(null);
@@ -114,26 +123,33 @@ export default function CardGame() {
     setTimeout(() => {
       setSelectedCard(null);
       setComputerCard(null);
-      setBattleResult("");
+      setBattleResult('');
       setRoundWinner(null);
     }, 2000);
   };
 
-  const calculateBattleScore = (playerCard: MemeCard, computerCard: MemeCard) => {
-    const playerTotal = playerCard.power + playerCard.defense + playerCard.special;
-    const computerTotal = computerCard.power + computerCard.defense + computerCard.special;
+  const calculateBattleScore = (
+    playerCard: MemeCard,
+    computerCard: MemeCard
+  ) => {
+    const playerTotal =
+      playerCard.power + playerCard.defense + playerCard.special;
+    const computerTotal =
+      computerCard.power + computerCard.defense + computerCard.special;
     return playerTotal - computerTotal;
   };
 
   useEffect(() => {
-  const checkGameOver = () => {
-    const allPlayerCardsPlayed = playerCards.every(card => card.isPlayed);
-    const allComputerCardsPlayed = computerCards.every(card => card.isPlayed);
-    
-    if (allPlayerCardsPlayed || allComputerCardsPlayed) {
-      handleGameOver();
-    }
-  };
+    const checkGameOver = () => {
+      const allPlayerCardsPlayed = playerCards.every((card) => card.isPlayed);
+      const allComputerCardsPlayed = computerCards.every(
+        (card) => card.isPlayed
+      );
+
+      if (allPlayerCardsPlayed || allComputerCardsPlayed) {
+        handleGameOver();
+      }
+    };
 
     if (gameStarted && !gameOver) {
       checkGameOver();
@@ -174,17 +190,19 @@ export default function CardGame() {
           </p>
           <div className="flex justify-center gap-4 mb-4">
             <div className="text-[#FF0B7A]">Player Score: {playerScore}</div>
-            <div className="text-[#45D62E] font-ibm">Computer Score: {computerScore}</div>
+            <div className="text-[#45D62E] font-ibm">
+              Computer Score: {computerScore}
+            </div>
           </div>
           <div className="flex justify-center gap-4">
             <Button
               onClick={initializeGame}
               className="bg-[#FF0B7A] hover:bg-[#FF0B7A]/80 text-white"
             >
-              {gameStarted ? "Restart Game" : "Start Game"}
+              {gameStarted ? 'Restart Game' : 'Start Game'}
             </Button>
             <Button
-              onClick={() => router.push("/gamecenter")}
+              onClick={() => router.push('/gamecenter')}
               className="bg-transparent hover:bg-[#FF0B7A]/10 text-[#FF0B7A] border-2 border-[#FF0B7A]"
             >
               <Home className="mr-2" size={18} />
@@ -204,7 +222,7 @@ export default function CardGame() {
                       initial={{ opacity: 0, x: -50 }}
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: -50 }}
-                      className={`relative ${roundWinner === "player" ? "ring-4 ring-[#45D62E]" : ""}`}
+                      className={`relative ${roundWinner === 'player' ? 'ring-4 ring-[#45D62E]' : ''}`}
                     >
                       <MemeCardComponent card={selectedCard} />
                     </motion.div>
@@ -227,7 +245,7 @@ export default function CardGame() {
                       initial={{ opacity: 0, x: 50 }}
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: 50 }}
-                      className={`relative ${roundWinner === "computer" ? "ring-4 ring-[#FF0B7A]" : ""}`}
+                      className={`relative ${roundWinner === 'computer' ? 'ring-4 ring-[#FF0B7A]' : ''}`}
                     >
                       <MemeCardComponent card={computerCard} />
                     </motion.div>
@@ -242,7 +260,7 @@ export default function CardGame() {
                 <motion.div
                   key={card.id}
                   whileHover={!card.isPlayed ? { scale: 1.05 } : {}}
-                  className={`cursor-pointer ${card.isPlayed ? "opacity-50" : ""}`}
+                  className={`cursor-pointer ${card.isPlayed ? 'opacity-50' : ''}`}
                   onClick={() => !card.isPlayed && handleCardSelect(card)}
                 >
                   <MemeCardComponent card={card} />
@@ -301,10 +319,10 @@ export default function CardGame() {
               <div className="col-span-2">
                 <p className="text-[#45D62E] font-ibm text-xl font-bold">
                   {playerScore > computerScore
-                    ? "🎉 You Won! 🎉"
+                    ? '🎉 You Won! 🎉'
                     : playerScore < computerScore
-                    ? "Better luck next time!"
-                    : "It's a tie!"}
+                      ? 'Better luck next time!'
+                      : "It's a tie!"}
                 </p>
               </div>
             </div>
@@ -319,7 +337,7 @@ export default function CardGame() {
               Play Again
             </Button>
             <Button
-              onClick={() => router.push("/gamecenter")}
+              onClick={() => router.push('/gamecenter')}
               className="bg-[#FF0B7A] hover:bg-[#FF0B7A]/80 flex items-center gap-2"
             >
               <Home size={18} />
@@ -363,4 +381,4 @@ function MemeCardComponent({ card }: { card: MemeCard }) {
       </CardContent>
     </Card>
   );
-} 
+}

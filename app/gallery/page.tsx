@@ -1,114 +1,147 @@
 // app/gallery/page.tsx
 
 "use client";
-import React, { useState } from "react";
 
+import { useState, useEffect, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Triangle } from "lucide-react";
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { buttonVariants, cardVariants } from "@/styles/animations";
 
-import { Card, CardContent } from "@/components/ui/card";
-import axios from "axios";
-import XShareButton from "@/components/XShareBtn";
-import usePagination from "@/hooks/usePagination";
-import { Pagination } from "@/components/ui/pagination";
-import Loader from "@/components/loader";
+const ITEMS_PER_PAGE = 9;
 
-interface memes {
-  cloudinaryUrl : string;
-  id: number;
+interface Meme {
+  id: string;
+  imageUrl: string;
+  creator: string;
+  createdAt: string;
 }
 
-export default function Showcase() {
-  const [hoveredMeme, setHoveredMeme] = useState<number | null>(null);
-  const [memes, setMemes] = useState<memes[]>([]);
-  const [isFetching, setIsFetching] = useState<boolean>(true);
-  const { currentItems, currentPage, totalPages, handlePageChange } =
-    usePagination({
-      items: memes,
-      itemsPerPage: 9,
-    });
+export default function GalleryPage() {
+  const [memes, setMemes] = useState<Meme[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
 
-  React.useEffect(() => {
-    const fetchMemes = async () => {
-      try {
-        setIsFetching(true);
-        const response = await axios.get("/api/memes");
-        const data = response.data;
-        setMemes(data);
-      } catch (error) {
-        console.error("Error fetching memes:", error);
-      } finally {
-        setIsFetching(false);
-      }
-    };
+  const fetchMemes = useCallback(async () => {
+    try {
+      const response = await fetch(`/api/memes?page=${currentPage}&limit=${ITEMS_PER_PAGE}`);
+      if (!response.ok) throw new Error("Failed to fetch memes");
+      const data = await response.json();
+      
+      setMemes(prev => [...prev, ...data.memes]);
+      setHasMore(data.pagination.hasMore);
+    } catch (error) {
+      console.error("Error fetching memes:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [currentPage]);
 
+  useEffect(() => {
     fetchMemes();
-  }, []);
-
+  }, [fetchMemes]);
 
   return (
-    <div className="p-8 min-h-full text-white">
-      <header className="mb-12 text-center">
-        <h1 className="mb-4 font-bold text-4xl text-pink-500">
-          Squid Meme Showcase
-        </h1>
-        <p className="text-green-400 text-xl font-ibm">
-          Discover and Enjoy Squid Game-Inspired Memes!
-        </p>
-      </header>
+    <div className="min-h-[90vh] text-white p-8">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3 }}
+        className="container mx-auto"
+      >
+        <motion.h1
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="text-5xl font-bold mb-16 text-center text-[#FF0B7A] font-squid"
+        >
+          Meme Gallery
+        </motion.h1>
 
-      {isFetching ? (
-       <Loader/>
-      ) : (
-        <>
-          <div className="gap-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-            {currentItems?.map((meme) => (
-              <motion.div
-                key={meme.id}
-                whileHover={{ scale: 1.05 }}
-                onHoverStart={() => setHoveredMeme(meme.id)}
-                onHoverEnd={() => setHoveredMeme(null)}
-              >
-                <Card className="border-2 border-pink-500 bg-gray-800 overflow-hidden">
-                  <CardContent className="relative p-0">
-                    <Image
-                      src={meme.cloudinaryUrl}
-                      alt={meme.cloudinaryUrl}
-                      width={200}
-                      height={200}
-                      className="w-full h-auto object-cover"
-                    />
-                    {hoveredMeme === meme.id && (
-                      <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className="absolute inset-0 flex justify-center items-center bg-black bg-opacity-50"
-                      >
-                        <p className="font-bold text-lg text-white">
-                          {/* {meme.display_name} */}
-                          <XShareButton imageUrl={meme.cloudinaryUrl} />
-                        </p>
-                      </motion.div>
-                    )}
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
+        {loading && memes.length === 0 ? (
+          <div className="flex justify-center items-center h-[60vh]">
+            <motion.div
+              animate={{
+                rotate: 360,
+                transition: { duration: 1, repeat: Infinity, ease: "linear" }
+              }}
+            >
+              <Triangle className="w-12 h-12 text-[#FF0B7A]" />
+            </motion.div>
           </div>
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-          />
-        </>
-      )}
+        ) : (
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={{
+              hidden: { opacity: 0 },
+              visible: {
+                opacity: 1,
+                transition: {
+                  staggerChildren: 0.1,
+                  duration: 0.3
+                },
+              },
+            }}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+          >
+            <AnimatePresence>
+              {memes?.map((meme, index) => (
+                <motion.div
+                  key={meme.id || index}
+                  variants={cardVariants}
+                  whileHover="hover"
+                  className="squid-card overflow-hidden will-change-transform"
+                  layout
+                >
+                  <div className="p-6">
+                    <div className="relative aspect-square rounded-lg overflow-hidden">
+                      <Image
+                        src={meme.imageUrl}
+                        alt={`Meme ${index + 1}`}
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        className="object-cover"
+                        loading={index < 6 ? "eager" : "lazy"}
+                      />
+                    </div>
+                    <div className="mt-4 flex justify-between items-center">
+                      <p className="text-gray-400 font-ibm">By {meme.creator}</p>
+                      {/* <motion.button
+                        variants={buttonVariants}
+                        whileHover="hover"
+                        whileTap="tap"
+                        className="squid-button px-4 py-2 rounded-lg text-sm will-change-transform"
+                      >
+                        Share
+                      </motion.button> */}
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </motion.div>
+        )}
 
-      {/* Background animation
-      <div className="top-0 left-0 z-[-1] absolute w-full h-full overflow-hidden">
-        <div className="top-1/4 left-1/4 absolute bg-[#FF0B7A] opacity-20 blur-xl rounded-full w-64 h-64 animate-blob filter mix-blend-multiply"></div>
-        <div className="top-3/4 right-1/4 absolute bg-[#45D62E] opacity-20 blur-xl rounded-full w-64 h-64 animate-blob animation-delay-2000 filter mix-blend-multiply"></div>
-        <div className="bottom-1/4 left-1/3 absolute bg-[#FF0B7A] opacity-20 blur-xl rounded-full w-64 h-64 animate-blob animation-delay-4000 filter mix-blend-multiply"></div>
-      </div> */}
+        {!loading && hasMore && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="mt-12 text-center"
+          >
+            <motion.button
+              variants={buttonVariants}
+              whileHover="hover"
+              whileTap="tap"
+              onClick={() => setCurrentPage(prev => prev + 1)}
+              className="squid-button px-8 py-3 rounded-lg will-change-transform"
+            >
+              Load More
+            </motion.button>
+          </motion.div>
+        )}
+      </motion.div>
     </div>
   );
 }

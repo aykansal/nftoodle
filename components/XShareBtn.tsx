@@ -1,5 +1,5 @@
-import React from "react";
-import { Button } from "@/components/ui/button";
+import React from 'react';
+import { Button } from '@/components/ui/button';
 
 const XShareButton = ({ imageUrl }: { imageUrl: string }) => {
   const shareOnTwitter = () => {
@@ -9,7 +9,7 @@ const XShareButton = ({ imageUrl }: { imageUrl: string }) => {
         `credits: @aykansal & @satyanshmittal`
     );
     const twitterUrl = `https://twitter.com/intent/tweet?text=${tweetContent}`;
-    window.open(twitterUrl, "_blank");
+    window.open(twitterUrl, '_blank');
   };
 
   return (

@@ -1,49 +1,49 @@
-"use client";
-import { useRef, useState, useEffect } from "react";
+'use client';
+import { useRef, useState, useEffect } from 'react';
 
-import axios from "axios";
-import { motion, AnimatePresence } from "framer-motion";
-import { ImagePlus, Type, Wand2, Palette, Triangle } from "lucide-react";
-import { useActiveAccount } from "thirdweb/react";
+import axios from 'axios';
+import { motion } from 'framer-motion';
+import { ImagePlus, Type, Wand2, Palette } from 'lucide-react';
+import { useActiveAccount } from 'thirdweb/react';
 
-import type { MemeGeneratorProps } from "@/lib/types";
-import { squidGameVariants, tabVariants } from "@/lib/data";
+import type { MemeGeneratorProps } from '@/lib/types';
+import { squidGameVariants, tabVariants } from '@/lib/data';
 
-import { Button } from "@/components/ui/button";
-import { Slider } from "@/components/ui/slider";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Slider } from '@/components/ui/slider';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Label } from "./ui/label";
-import { Input } from "./ui/input";
-import { Card, CardContent } from "@/components/ui/card";
+} from '@/components/ui/select';
+import { Label } from './ui/label';
+import { Input } from './ui/input';
+// import { Card, CardContent } from '@/components/ui/card';
+import { buttonVariants, cardVariants } from '@/styles/animations';
 
 export function MemeGenerator({ defaultImage }: MemeGeneratorProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [image, setImage] = useState<HTMLImageElement | null>(null);
-  const [topText, setTopText] = useState("TOP TEXT");
-  const [bottomText, setBottomText] = useState("BOTTOM TEXT");
+  const [topText, setTopText] = useState('TOP TEXT');
+  const [bottomText, setBottomText] = useState('BOTTOM TEXT');
   const [fontSize, setFontSize] = useState(25);
-  const [textColor, setTextColor] = useState("#FF0B7A");
-  const [textEffect, setTextEffect] = useState("none");
-  const [imageFilter, setImageFilter] = useState("none");
-  const [backgroundColor, setBackgroundColor] = useState("#000000");
-  const [activeTab, setActiveTab] = useState("text");
+  const [textColor, setTextColor] = useState('#FF0B7A');
+  const [textEffect, setTextEffect] = useState('none');
+  const [imageFilter, setImageFilter] = useState('none');
+  const [backgroundColor, setBackgroundColor] = useState('#000000');
+  const [activeTab, setActiveTab] = useState('text');
   // const [isDownloading, setIsDownloading] = useState(false);
   // const [isSharing, setIsSharing] = useState(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
 
-  const accountAddress = useActiveAccount()?.address
+  const accountAddress = useActiveAccount()?.address;
 
   // Loading image
   useEffect(() => {
     const img = new Image();
-    img.crossOrigin = "anonymous";
+    img.crossOrigin = 'anonymous';
     img.src = defaultImage;
     img.onload = () => setImage(img);
   }, [defaultImage]);
@@ -52,7 +52,7 @@ export function MemeGenerator({ defaultImage }: MemeGeneratorProps) {
   useEffect(() => {
     if (!canvasRef.current || !image) return;
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
     const canvasWidth = 400;
@@ -75,19 +75,19 @@ export function MemeGenerator({ defaultImage }: MemeGeneratorProps) {
     const offsetX = (canvasWidth - imageWidth) / 2;
     const offsetY = (canvasHeight - imageHeight) / 2;
 
-    ctx.filter = imageFilter === "none" ? "none" : `${imageFilter}(100%)`;
+    ctx.filter = imageFilter === 'none' ? 'none' : `${imageFilter}(100%)`;
     ctx.drawImage(image, offsetX, offsetY, imageWidth, imageHeight);
-    ctx.filter = "none";
+    ctx.filter = 'none';
 
     // Text rendering
     ctx.fillStyle = textColor;
-    ctx.strokeStyle = "black";
+    ctx.strokeStyle = 'black';
     ctx.lineWidth = fontSize / 6;
     ctx.font = `bold ${fontSize}px Impact`;
-    ctx.textAlign = "center";
+    ctx.textAlign = 'center';
 
-    if (textEffect === "shadow") {
-      ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
+    if (textEffect === 'shadow') {
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
       ctx.shadowBlur = 5;
       ctx.shadowOffsetX = 3;
       ctx.shadowOffsetY = 3;
@@ -105,14 +105,14 @@ export function MemeGenerator({ defaultImage }: MemeGeneratorProps) {
       ctx.fillText(bottomText, canvas.width / 2, canvas.height - 20);
     }
 
-    ctx.shadowColor = "transparent";
+    ctx.shadowColor = 'transparent';
     ctx.shadowBlur = 0;
     ctx.shadowOffsetX = 0;
     ctx.shadowOffsetY = 0;
 
-    ctx.font = "bold 11px Arial";
-    ctx.fillStyle = "#FF0B7A";
-    ctx.fillText("NFToodle", canvas.width - 30, canvas.height - 7.5);
+    ctx.font = 'bold 11px Arial';
+    ctx.fillStyle = '#FF0B7A';
+    ctx.fillText('NFToodle', canvas.width - 30, canvas.height - 7.5);
   }, [
     image,
     topText,
@@ -142,17 +142,20 @@ export function MemeGenerator({ defaultImage }: MemeGeneratorProps) {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const imageDataUrl = canvas.toDataURL("image/png");
+    const imageDataUrl = canvas.toDataURL('image/png');
 
     try {
-      const { status } = await axios.post("/api/memes", { imageDataUrl, accountAddress });
+      const { status } = await axios.post('/api/memes', {
+        imageDataUrl,
+        accountAddress,
+      });
       console.log(
         status === 200
-          ? "Image uploaded successfully"
+          ? 'Image uploaded successfully'
           : `Upload failed with status ${status}`
       );
     } catch (error) {
-      console.error("Error during image upload:", error);
+      console.error('Error during image upload:', error);
     } finally {
       setIsSaving(false);
     }
@@ -164,236 +167,290 @@ export function MemeGenerator({ defaultImage }: MemeGeneratorProps) {
       animate="visible"
       exit="exit"
       variants={squidGameVariants}
-      className="gap-8 grid md:grid-cols-[2fr,1fr] bg-[#0A0A0A] p-8 rounded-xl text-white"
+      className="grid md:grid-cols-[2fr,1fr] gap-6 p-4 md:p-8 rounded-xl text-white"
     >
       {/* Left Side (Canvas and Actions) */}
-      <Card className="border-[#FF0B7A] border-2 bg-[#1A1A1A]">
-        <CardContent className="space-y-6 p-6">
+      <motion.div
+        variants={cardVariants}
+        initial="initial"
+        animate="visible"
+        className="squid-card rounded-xl overflow-hidden"
+      >
+        <div className="space-y-6 p-4 md:p-6">
           <motion.div
-            className="relative bg-[#1F1F1F] shadow-[#FF0B7A]/20 shadow-lg p-4 rounded-lg overflow-hidden"
-            whileHover={{ scale: 1.02 }}
-            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+            className="relative w-full max-w-[540px] mx-auto flex items-center justify-center rounded-lg overflow-hidden bg-gray-900/50"
           >
-            <Triangle className="top-2 left-2 absolute w-6 h-6 text-[#FF0B7A]" />
-            <Triangle className="right-2 bottom-2 absolute w-6 h-6 text-[#FF0B7A]" />
             <canvas
               ref={canvasRef}
-              className="border-neutral-400 mx-auto border max-w-full h-auto"
+              className="max-w-full max-h-[540px] object-contain"
             />
           </motion.div>
-          <div className="flex gap-4">
-            <ButtonGroup
-              isSaving={isSaving}
-              handleSave={handleSave}
-              defaultImage={defaultImage}
-            />
-          </div>
-        </CardContent>
-      </Card>
 
-      {/* Right Side (Tabs & Controls) */}
-      <Card className="border-[#FF0B7A] border-2 bg-[#1A1A1A]">
-        <CardContent className="space-y-6 p-6">
           <motion.div
-            className="space-y-4 bg-[#1F1F1F] shadow-[#FF0B7A]/20 shadow-md p-4 rounded-lg"
-            whileHover={{ boxShadow: "0 0 15px rgba(255, 11, 122, 0.3)" }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="flex flex-wrap gap-3 justify-center"
           >
-            <TextInputGroup
-              topText={topText}
-              bottomText={bottomText}
-              setTopText={setTopText}
-              setBottomText={setBottomText}
-              fontSize={fontSize}
-              setFontSize={setFontSize}
-            />
+            <motion.button
+              variants={buttonVariants}
+              whileHover={{
+                scale: 1.05,
+                textShadow: "0 0 8px rgb(255,11,122)",
+                boxShadow: "0 0 8px rgb(255,11,122)"
+              }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleSave}
+              disabled={isSaving}
+              className="squid-button px-6 py-2.5 text-lg rounded-lg will-change-transform bg-gradient-to-r from-[#FF0B7A] to-[#FF0B7A]/80 hover:from-[#FF0B7A]/90 hover:to-[#FF0B7A]/70 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isSaving ? 'Saving...' : 'Save Meme'}
+            </motion.button>
           </motion.div>
+        </div>
+      </motion.div>
 
-          <Tabs
-            defaultValue="text"
-            className="text-white"
-            onValueChange={setActiveTab}
-          >
-            <TabsList className="bg-[#1F1F1F] w-full">
-              {["templates", "text", "effects", "background"].map((tab) => (
-                <TabTrigger key={tab} tab={tab} activeTab={activeTab} />
-              ))}
+      {/* Right Side (Controls) */}
+      <motion.div
+        variants={cardVariants}
+        initial="initial"
+        animate="visible"
+        className="squid-card rounded-xl overflow-hidden"
+      >
+        <div className="p-4 md:p-6 space-y-6">
+          <Tabs defaultValue="text" className="w-full">
+            <TabsList className="grid grid-cols-3 gap-x-2 mb-6">
+              <TabsTrigger
+                value="text"
+                onClick={() => setActiveTab('text')}
+                className={`px-4 py-2.5 rounded-lg transition-all flex items-center justify-center ${
+                  activeTab === 'text'
+                    ? 'bg-[#FF0B7A] text-white'
+                    : 'text-[#FF0B7A] hover:bg-[#FF0B7A]/10'
+                }`}
+              >
+                <Type className="w-5 h-5 mr-1.5" />
+                <span className="mt-0.5">Text</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="effects"
+                onClick={() => setActiveTab('effects')}
+                className={`px-4 py-2.5 rounded-lg transition-all flex items-center justify-center ${
+                  activeTab === 'effects'
+                    ? 'bg-[#FF0B7A] text-white'
+                    : 'text-[#FF0B7A] hover:bg-[#FF0B7A]/10'
+                }`}
+              >
+                <Wand2 className="w-5 h-5 mr-1.5" />
+                <span className="mt-0.5">Effects</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="background"
+                onClick={() => setActiveTab('background')}
+                className={`px-4 py-2.5 rounded-lg transition-all flex items-center justify-center ${
+                  activeTab === 'background'
+                    ? 'bg-[#FF0B7A] text-white'
+                    : 'text-[#FF0B7A] hover:bg-[#FF0B7A]/10'
+                }`}
+              >
+                <Palette className="w-5 h-5 mr-1.5" />
+                <span className="mt-0.5">BG</span>
+              </TabsTrigger>
             </TabsList>
 
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeTab}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.2 }}
-                className="mt-4"
-              >
-                {/* Tab Content */}
-                <TabsContent value="templates">
-                  {/* Templates Tab */}
-                  <Card className="border-[#FF0B7A] bg-[#1F1F1F] border">
-                    <CardContent className="p-4 text-white">
-                      Coming Soon...
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-                <TabsContent value="text">
-                  <Card className="border-[#FF0B7A] bg-[#1F1F1F] border">
-                    <CardContent className="p-4">
-                      <TextControl
-                        setTextColor={setTextColor}
-                        setTextEffect={setTextEffect}
-                        textColor={textColor}
-                        textEffect={textEffect}
-                      />
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-                <TabsContent value="effects">
-                  <Card className="border-[#FF0B7A] bg-[#1F1F1F] border">
-                    <CardContent className="p-4">
-                      <ImageFilterControl
-                        setImageFilter={setImageFilter}
-                        imageFilter={imageFilter}
-                      />
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-                <TabsContent value="background">
-                  <Card className="border-[#FF0B7A] bg-[#1F1F1F] border">
-                    <CardContent className="p-4">
-                      <BackgroundControl
-                        setBackgroundColor={setBackgroundColor}
-                        backgroundColor={backgroundColor}
-                      />
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-              </motion.div>
-            </AnimatePresence>
+            <TabsContent value="text" className="space-y-6">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Top Text</Label>
+                  <Input
+                    type="text"
+                    value={topText}
+                    onChange={(e) => setTopText(e.target.value)}
+                    className="bg-gray-800/50 border-[#FF0B7A]/30 focus:border-[#FF0B7A] transition-colors"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Bottom Text</Label>
+                  <Input
+                    type="text"
+                    value={bottomText}
+                    onChange={(e) => setBottomText(e.target.value)}
+                    className="bg-gray-800/50 border-[#FF0B7A]/30 focus:border-[#FF0B7A] transition-colors"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Font Size: {fontSize}px</Label>
+                  <Slider
+                    value={[fontSize]}
+                    onValueChange={([value]) => setFontSize(value)}
+                    min={12}
+                    max={72}
+                    step={1}
+                    className="py-2"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Text Color</Label>
+                  <Input
+                    type="color"
+                    value={textColor}
+                    onChange={(e) => setTextColor(e.target.value)}
+                    className="h-12 p-1 bg-gray-800/50 border-[#FF0B7A]/30 focus:border-[#FF0B7A] transition-colors"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Text Effect</Label>
+                  <Select value={textEffect} onValueChange={setTextEffect}>
+                    <SelectTrigger className="bg-gray-800/50 border-[#FF0B7A]/30 focus:border-[#FF0B7A]">
+                      <SelectValue placeholder="Select effect" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">None</SelectItem>
+                      <SelectItem value="shadow">Shadow</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="effects" className="space-y-6">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Image Filter</Label>
+                  <Select value={imageFilter} onValueChange={setImageFilter}>
+                    <SelectTrigger className="bg-gray-800/50 border-[#FF0B7A]/30 focus:border-[#FF0B7A]">
+                      <SelectValue placeholder="Select filter" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">None</SelectItem>
+                      <SelectItem value="grayscale">Grayscale</SelectItem>
+                      <SelectItem value="sepia">Sepia</SelectItem>
+                      <SelectItem value="invert">Invert</SelectItem>
+                      <SelectItem value="saturate">Saturate</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="background" className="space-y-6">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Background Color</Label>
+                  <Input
+                    type="color"
+                    value={backgroundColor}
+                    onChange={(e) => setBackgroundColor(e.target.value)}
+                    className="h-12 p-1 bg-gray-800/50 border-[#FF0B7A]/30 focus:border-[#FF0B7A] transition-colors"
+                  />
+                </div>
+              </div>
+            </TabsContent>
           </Tabs>
-        </CardContent>
-      </Card>
+        </div>
+      </motion.div>
     </motion.div>
   );
 }
 
 // Extracted Components (Button Group, Text Input Group, Tab Trigger, etc.)
-const ButtonGroup = ({
-  isSaving,
-  handleSave,
-  // defaultImage,
-}: {
-  isSaving: boolean;
-  handleSave: () => void;
-  defaultImage: string;
-}) => {
+// const ButtonGroup = ({
+//   isSaving,
+//   handleSave,
+//   // defaultImage,
+// }: {
+//   isSaving: boolean;
+//   handleSave: () => void;
+//   defaultImage: string;
+// }) => {
+//   return (
+//     <>
+//       <Button
+//         onClick={handleSave}
+//         className="bg-pink-500 hover:bg-pink-600 text-white font-ibm"
+//         disabled={isSaving}
+//       >
+//         {isSaving ? (
+//           <motion.div
+//             animate={{ rotate: 360 }}
+//             transition={{
+//               duration: 1,
+//               repeat: Number.POSITIVE_INFINITY,
+//               ease: 'linear',
+//             }}
+//           >
+//             ↻
+//           </motion.div>
+//         ) : (
+//           'Save to Gallery'
+//         )}
+//       </Button>
+//     </>
+//   );
+// };
 
-  return (
-    <>
-      {/* <Button
-      onClick={handleShare}
-      className="bg-[#FF0B7A] hover:bg-[#FF0B7A]/90 py-3 rounded-full w-full font-bold text-white transform transition-all duration-300 ease-in-out hover:scale-105"
-      disabled={isSharing}
-    >
-      {isSharing ? (
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{
-            duration: 1,
-            repeat: Number.POSITIVE_INFINITY,
-            ease: "linear",
-          }}
-        >
-          ↻
-        </motion.div>
-      ) : (
-        "Share on X"
-      )}
-    </Button> */}
-      <Button
-        onClick={handleSave}
-        className="bg-[#FF0B7A] hover:bg-[#FF0B7A]/90 py-3 rounded-full w-full font-bold text-white transform transition-all duration-300 ease-in-out hover:scale-105"
-        disabled={isSaving}
-      >
-        {isSaving ? (
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{
-              duration: 1,
-              repeat: Number.POSITIVE_INFINITY,
-              ease: "linear",
-            }}
-          >
-            ↻
-          </motion.div>
-        ) : (
-          "Save to Gallery"
-        )}
-      </Button>
-    </>
-  );
-};
-
-const TextInputGroup = ({
-  topText,
-  bottomText,
-  setTopText,
-  setBottomText,
-  fontSize,
-  setFontSize,
-}: {
-  topText: string;
-  bottomText: string;
-  setTopText: (value: string) => void;
-  setBottomText: (value: string) => void;
-  fontSize: number;
-  setFontSize: (value: number) => void;
-}) => (
-  <div className="space-y-4">
-    <Input
-      type="text"
-      value={topText}
-      onChange={(e) => setTopText(e.target.value)}
-      className="border-[#FF0B7A] bg-black p-3 border rounded-lg w-full text-white/90 placeholder:text-white/50"
-      placeholder="Top Text"
-    />
-    <Input
-      type="text"
-      value={bottomText}
-      onChange={(e) => setBottomText(e.target.value)}
-      className="border-[#FF0B7A] bg-black p-3 border rounded-lg w-full text-white/90 placeholder:text-white/50"
-      placeholder="Bottom Text"
-    />
-    <div className="flex items-center space-x-2">
-      <Label className="font-medium text-sm text-white">Font Size:</Label>
-      <Slider
-        value={[fontSize]}
-        onValueChange={(value) => setFontSize(value[0])}
-        min={20}
-        max={80}
-        step={2}
-        className="flex-grow"
-      />
-      <span className="font-medium text-sm">{fontSize}px</span>
-    </div>
-  </div>
-);
+// const TextInputGroup = ({
+//   topText,
+//   bottomText,
+//   setTopText,
+//   setBottomText,
+//   fontSize,
+//   setFontSize,
+// }: {
+//   topText: string;
+//   bottomText: string;
+//   setTopText: (value: string) => void;
+//   setBottomText: (value: string) => void;
+//   fontSize: number;
+//   setFontSize: (value: number) => void;
+// }) => (
+//   <div className="space-y-4">
+//     <Input
+//       type="text"
+//       value={topText}
+//       onChange={(e) => setTopText(e.target.value)}
+//       className="border-[#FF0B7A] bg-black p-3 border rounded-lg w-full text-white/90 placeholder:text-white/50"
+//       placeholder="Top Text"
+//     />
+//     <Input
+//       type="text"
+//       value={bottomText}
+//       onChange={(e) => setBottomText(e.target.value)}
+//       className="border-[#FF0B7A] bg-black p-3 border rounded-lg w-full text-white/90 placeholder:text-white/50"
+//       placeholder="Bottom Text"
+//     />
+//     <div className="flex items-center space-x-2">
+//       <Label className="font-medium text-sm text-white">Font Size:</Label>
+//       <Slider
+//         value={[fontSize]}
+//         onValueChange={(value) => setFontSize(value[0])}
+//         min={20}
+//         max={80}
+//         step={2}
+//         className="flex-grow"
+//       />
+//       <span className="font-medium text-sm">{fontSize}px</span>
+//     </div>
+//   </div>
+// );
 
 const TabTrigger = ({ tab, activeTab }: { tab: string; activeTab: string }) => (
   <motion.div
     variants={tabVariants}
-    animate={activeTab === tab ? "active" : "inactive"}
+    animate={activeTab === tab ? 'active' : 'inactive'}
     className="flex-1"
   >
     <TabsTrigger
       value={tab}
       className="py-2 rounded-lg w-full transition-all duration-300 ease-in-out"
     >
-      {tab === "templates" && <ImagePlus className="mr-2" />}
-      {tab === "text" && <Type className="mr-2" />}
-      {tab === "effects" && <Wand2 className="mr-2" />}
-      {tab === "background" && <Palette className="mr-2" />}
+      {tab === 'templates' && <ImagePlus className="mr-2" />}
+      {tab === 'text' && <Type className="mr-2" />}
+      {tab === 'effects' && <Wand2 className="mr-2" />}
+      {tab === 'background' && <Palette className="mr-2" />}
       {tab.charAt(0).toUpperCase() + tab.slice(1)}
     </TabsTrigger>
   </motion.div>

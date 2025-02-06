@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
-import { v2 as cloudinary } from "cloudinary";
-import { prisma } from "@/lib/prisma";
+import { NextRequest, NextResponse } from 'next/server';
+import { v2 as cloudinary } from 'cloudinary';
+import { prisma } from '@/lib/prisma';
 
 // Configure Cloudinary
 cloudinary.config({
@@ -20,8 +20,8 @@ const uploadToCloudinary = async ({
 }) => {
   try {
     // Validate Base64 image format
-    if (!imageDataUrl || !imageDataUrl.startsWith("data:image/png;base64,")) {
-      throw new Error("Invalid or empty imageDataUrl");
+    if (!imageDataUrl || !imageDataUrl.startsWith('data:image/png;base64,')) {
+      throw new Error('Invalid or empty imageDataUrl');
     }
 
     const uniquePublicId = `nftoodle_${Date.now()}`;
@@ -29,11 +29,11 @@ const uploadToCloudinary = async ({
       const uploadStream = cloudinary.uploader.upload_stream(
         {
           public_id: uniquePublicId,
-          folder: "nftoodle",
-          format: "png",
+          folder: 'nftoodle',
+          format: 'png',
           transformation: {
-            quality: "auto",
-            fetch_format: "auto",
+            quality: 'auto',
+            fetch_format: 'auto',
           },
           context: { accountAddress },
         },
@@ -43,14 +43,14 @@ const uploadToCloudinary = async ({
         }
       );
 
-      const buffer = Buffer.from(imageDataUrl.split(",")[1], "base64");
+      const buffer = Buffer.from(imageDataUrl.split(',')[1], 'base64');
       uploadStream.end(buffer);
     });
 
     return result as { url: string }; // Adjusted type to ensure compatibility
   } catch (error) {
-    console.error("Cloudinary upload failed", error);
-    throw new Error("Failed to upload image to Cloudinary");
+    console.error('Cloudinary upload failed', error);
+    throw new Error('Failed to upload image to Cloudinary');
   }
 };
 
@@ -87,35 +87,76 @@ export async function POST(req: NextRequest) {
     // Validate inputs
     if (!imageDataUrl || !accountAddress) {
       return NextResponse.json(
-        { error: "Invalid input: imageDataUrl or accountAddress missing" },
+        { error: 'Invalid input: imageDataUrl or accountAddress missing' },
         { status: 400 }
       );
     }
 
     // Upload to Cloudinary
-    const { url: cloudinaryUrl } = await uploadToCloudinary({ imageDataUrl, accountAddress });
+    const { url: cloudinaryUrl } = await uploadToCloudinary({
+      imageDataUrl,
+      accountAddress,
+    });
 
     // Save meme in the database
     const meme = await addMemeToDatabase({ cloudinaryUrl, accountAddress });
 
     return NextResponse.json(meme, { status: 201 });
   } catch (error) {
-    console.error("Error in POST handler", error);
-    //@ts-expect-error ignore
-    return NextResponse.json({ error: error.message || "Internal server error" }, { status: 500 });
+    console.error('Error in POST handler', error);
+    return NextResponse.json(
+      // @ts-expect-error ignore
+      { error: error.message || 'Internal server error' },
+      { status: 500 }
+    );
   }
 }
 
-// GET Handler: Fetch all memes
-export async function GET() {
+// GET Handler: Fetch memes with pagination
+export async function GET(req: NextRequest) {
   try {
+    const searchParams = req.nextUrl.searchParams;
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '9');
+    const skip = (page - 1) * limit;
+
+    // Get total count for pagination
+    const totalCount = await prisma.meme.count();
+
+    // Fetch memes with pagination
     const memes = await prisma.meme.findMany({
-      orderBy: { createdAt: "desc" },
+      skip,
+      take: limit,
+      orderBy: {
+        createdAt: 'desc'
+      },
+      include: {
+        User: true
+      }
     });
-    return NextResponse.json(memes, { status: 200 });
+
+    // Transform the data
+    const transformedMemes = memes.map(meme => ({
+      id: meme.id,
+      imageUrl: meme.cloudinaryUrl,
+      creator: meme.User?.userWallet.substring(0, 6) + '...' + meme.User?.userWallet.substring(meme.User?.userWallet.length - 6),
+      createdAt: meme.createdAt
+    }));
+
+    return NextResponse.json({
+      memes: transformedMemes,
+      pagination: {
+        currentPage: page,
+        totalPages: Math.ceil(totalCount / limit),
+        totalItems: totalCount,
+        hasMore: skip + limit < totalCount
+      }
+    });
   } catch (error) {
-    console.error("Error in GET handler", error);
-    //@ts-expect-error ignore
-    return NextResponse.json({ error: error.message || "Internal server error" }, { status: 500 });
+    console.error('Error fetching memes:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch memes' },
+      { status: 500 }
+    );
   }
 }

@@ -4,7 +4,7 @@ export const squidGameVariants = {
     opacity: 1,
     scale: 1,
     transition: {
-      type: "spring",
+      type: 'spring',
       stiffness: 200,
       damping: 20,
     },
@@ -23,7 +23,7 @@ export const tabVariants = {
   active: {
     scale: 1.1,
     transition: {
-      type: "spring",
+      type: 'spring',
       stiffness: 300,
       damping: 20,
     },

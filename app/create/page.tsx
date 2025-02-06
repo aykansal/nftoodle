@@ -1,84 +1,110 @@
-"use client";
-import { useEffect, useState } from "react";
+'use client';
+import { useEffect, useState } from 'react';
 
-import axios from "axios";
-import Link from "next/link";
-import Image from "next/image";
-import { verifyValidImages } from "@/lib/verify";
-import usePagination from "@/hooks/usePagination";
-import { Pagination } from "@/components/ui/pagination";
-import { motion, AnimatePresence } from "framer-motion";
-import { Card, CardContent } from "@/components/ui/card";
-import Loader from "@/components/loader";
+import axios from 'axios';
+import Link from 'next/link';
+import Image from 'next/image';
+import { Pagination } from '@/components/ui/pagination';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Card, CardContent } from '@/components/ui/card';
+import Loader from '@/components/loader';
 
-const CACHE_KEY = "nfts";
-const CACHE_EXPIRATION = 60 * 60 * 2; // Cache expires in 24 hours (in seconds)
+const CACHE_KEY = 'nfts_cache';
+const ITEMS_PER_PAGE = 9;
+
+interface NFTCache {
+  urls: string[];
+  timestamp: number;
+  totalPages: number;
+  total: number;
+}
 
 export default function CreatePage() {
   const [selectedNft, setSelectedNft] = useState<number | null>(null);
   const [nfts, setNfts] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
-  const [, setIsVerifying] = useState(false);
-  const [isRedirecting, setIsRedirecting] = useState(false);
+  const [totalPages, setTotalPages] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const { currentItems, currentPage, totalPages, handlePageChange } =
-    usePagination({
-      items: nfts,
-      itemsPerPage: 9,
-    });
+  // const getCachedData = (page: number): string[] | null => {
+  const getCachedData = (page: number): string[] | null => {
+    console.log(page);
+    const cached = localStorage.getItem(CACHE_KEY);
+    if (!cached) return null;
 
-  const getCachedNfts = (): string[] | null => {
-    const cachedData = localStorage.getItem(CACHE_KEY);
-    if (cachedData) {
-      const parsedData = JSON.parse(cachedData);
-      const { nfts, timestamp } = parsedData;
-      const currentTime = Date.now() / 1000;
-      if (currentTime - timestamp < CACHE_EXPIRATION) {
-        return nfts;
-      }
+    const data: NFTCache = JSON.parse(cached);
+    const now = Date.now();
+    if (now - data.timestamp > 24 * 60 * 60 * 1000) {
+      localStorage.removeItem(CACHE_KEY);
+      return null;
     }
-    return null;
+    return data.urls;
   };
 
-  useEffect(() => {
-    const fetchNfts = async () => {
-      setLoading(true);
-      const cachedNfts = getCachedNfts();
-      if (cachedNfts) {
-        setNfts(cachedNfts);
+  const setCacheData = (
+    newUrls: string[],
+    total: number,
+    totalPages: number
+  ) => {
+    const cache: NFTCache = {
+      urls: newUrls,
+      timestamp: Date.now(),
+      total,
+      totalPages,
+    };
+    localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
+  };
+
+  const fetchPageData = async (page: number) => {
+    setLoading(true);
+    try {
+      const cachedData = getCachedData(page);
+      if (cachedData) {
+        setNfts(cachedData);
         setLoading(false);
         return;
       }
 
-      try {
-        const fetchedImages = await axios
-          .get("/api/nfts")
-          .then((res) => res.data);
-        setIsVerifying(true);
-        const validImages = await verifyValidImages(fetchedImages);
-        setNfts(validImages);
-        localStorage.setItem(
-          CACHE_KEY,
-          JSON.stringify({
-            nfts: validImages,
-            timestamp: Math.floor(Date.now() / 1000),
-          })
-        );
-      } catch (error) {
-        console.error("Failed to fetch NFTs:", error);
-      } finally {
-        setIsVerifying(false);
-        setLoading(false);
-      }
-    };
+      const response = await axios.get(
+        `/api/nfts?page=${page}&limit=${ITEMS_PER_PAGE}`
+      );
+      const { urls, total, totalPages } = response.data;
 
-    fetchNfts();
-  }, []);
+      setNfts((prev) => {
+        const newUrls = [...prev];
+        const startIdx = (page - 1) * ITEMS_PER_PAGE;
+        urls.forEach((url: string, idx: number) => {
+          newUrls[startIdx + idx] = url;
+        });
+        setCacheData(newUrls, total, totalPages);
+        return newUrls;
+      });
+
+      setTotalPages(totalPages);
+    } catch (error) {
+      console.error('Error fetching NFTs:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePageChange = async (newPage: number) => {
+    if (newPage === currentPage) return;
+    setCurrentPage(newPage);
+    await fetchPageData(newPage);
+  };
+
+  useEffect(() => {
+    fetchPageData(1);
+  }, [fetchPageData]);
+
+  const currentItems = nfts.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
 
   const handleNftClick = (index: number) => {
-    if (isRedirecting) return;
     setSelectedNft(index);
-    setIsRedirecting(true);
 
     setTimeout(() => {
       window.location.href = `/create/${index}?imageUrl=${encodeURIComponent(
@@ -127,14 +153,14 @@ export default function CreatePage() {
                   <Card
                     className={`bg-gray-800 border-2 ${
                       selectedNft === index
-                        ? "border-[#45D62E]"
-                        : "border-[#FF0B7A]"
+                        ? 'border-[#45D62E]'
+                        : 'border-[#FF0B7A]'
                     } overflow-hidden cursor-pointer transition-all duration-300`}
                   >
                     <CardContent className="relative p-0">
                       <div className="relative w-full h-72">
                         <Image
-                          src={nft || "/placeholder.svg"}
+                          src={nft || '/placeholder.svg'}
                           alt={`NFT ${index + 1}`}
                           layout="fill"
                           objectFit="cover"
