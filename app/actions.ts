@@ -1,13 +1,13 @@
-"use server";
+'use server';
 
-import { redirect } from "next/navigation";
+import { redirect } from 'next/navigation';
 
 export async function createUser() {
-  const res = await fetch("https://...");
+  const res = await fetch('https://...');
 
   if (!res.ok) {
-    return { message: "Please enter a valid email" };
+    return { message: 'Please enter a valid email' };
   }
 
-  redirect("/");
+  redirect('/');
 }

@@ -1,24 +1,29 @@
-"use client";
-import { motion } from "framer-motion";
-import Link from "next/link";
-import Wallet from "@/components/thirdweb/ConnectWallet";
+'use client';
+import Link from 'next/link';
+import { motion } from 'framer-motion';
+import Wallet from '@/components/thirdweb/ConnectWallet';
+import { useActiveAccount} from 'thirdweb/react';
 
-export function Header() {
+export default function Header() {
   const navItems = [
-    { name: "Create", href: "/create" },
-    { name: "Gallery", href: "/gallery" },
-    { name: "MyMemes", href: "/my-memes" },
+    // { name: 'Create', href: '/create' },
+    { name: 'Platforms', href: '/platforms' },
+    { name: 'Gallery', href: '/gallery' },
+    { name: 'MyMemes', href: '/my-memes' },
+    { name: 'GameZone', href: '/gamezone' },
     // { name: "Profile", href: "/profile" },
-    { name: "GameZone", href: "/gamecenter" },
   ];
+
+  const connectionStatus = useActiveAccount();
+  console.log(connectionStatus)
 
   return (
     <header className="border-[#FF0B7A] bg-[#0A0A0A] border-b-2 h-[10vh]">
       <div className="flex justify-between items-center mx-auto px-4 py-3 container">
         <Link href="/" className="group">
-          <h1 className="group-hover:text-[#FF0B7A] font-bold text-4xl text-white transition-colors duration-300 ease-in-out">
+          <h1 className="group-hover:text-[#FF0B7A] font-bold text-4xl text-white transition-colors duration-300 ease-in-out font-squid">
             NFT
-            <span className="group-hover:text-white text-[#FF0B7A] transition-colors duration-300 ease-in-out">
+            <span className="group-hover:text-white text-[#FF0B7A] transition-colors duration-300 ease-in-out font-squid">
               oodle
             </span>
           </h1>
@@ -35,7 +40,7 @@ export function Header() {
               </span>
               <motion.div
                 className="bottom-0 left-0 absolute bg-[#FF0B7A] w-0 hover:w-full h-0.5 transition-all duration-200 ease-in-out"
-                whileHover={{ width: "100%" }}
+                whileHover={{ width: '100%' }}
               />
             </Link>
           ))}

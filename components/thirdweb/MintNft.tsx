@@ -1,27 +1,27 @@
 // MintNft.tsx
-"use client";
+'use client';
 
-import { main } from "@/app/api/mint-nft/get";
-import { useActiveAccount } from "thirdweb/react";
-import { mintWithSignature } from "thirdweb/extensions/erc721";
-import { defineChain } from "thirdweb/chains";
+import { main } from '@/app/api/mint-nft/get';
+import { useActiveAccount } from 'thirdweb/react';
+import { mintWithSignature } from 'thirdweb/extensions/erc721';
+import { defineChain } from 'thirdweb/chains';
 import {
   sendAndConfirmTransaction,
   createThirdwebClient,
   getContract,
-} from "thirdweb";
-import { Button } from "@/components/ui/button";
-import { useState, useEffect } from "react";
+} from 'thirdweb';
+import { Button } from '@/components/ui/button';
+import { useState, useEffect } from 'react';
 import {
   Tooltip,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+} from '@/components/ui/tooltip';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
-const CONTRACT_ADDRESS = "0xaC434dc0061aD90B45415e92b160D7Bbaa21F5db";
+const CONTRACT_ADDRESS = '0xaC434dc0061aD90B45415e92b160D7Bbaa21F5db';
 const CHAIN_ID = 656476;
-const CLIENT_ID = "aa99b0e9769d2262d120e7aec4ec7a94";
+const CLIENT_ID = 'aa99b0e9769d2262d120e7aec4ec7a94';
 
 export default function MintNft({
   // @ts-expect-error ignore
@@ -66,7 +66,7 @@ export default function MintNft({
       };
       img.onerror = () => {
         // @ts-expect-error ignore
-        setError("Failed to load NFT image");
+        setError('Failed to load NFT image');
         setIsLoading(false);
       };
     } else {
@@ -77,7 +77,7 @@ export default function MintNft({
   useEffect(() => {
     if (!name || !description || !image) {
       // @ts-expect-error ignore
-      setError("Missing required NFT metadata");
+      setError('Missing required NFT metadata');
     }
   }, [name, description, image]);
 
@@ -87,10 +87,10 @@ export default function MintNft({
       return;
     } else if (
       error?.code === -32000 &&
-      error?.message?.includes("Insufficient funds")
+      error?.message?.includes('Insufficient funds')
     ) {
       // @ts-expect-error ignore
-      setError("Insufficient funds to complete transaction");
+      setError('Insufficient funds to complete transaction');
       onMintComplete(false);
       return;
     }
@@ -101,7 +101,7 @@ export default function MintNft({
 
   async function mint() {
     if (!wallet) {
-      handleError(null, "Please connect your wallet first");
+      handleError(null, 'Please connect your wallet first');
       return;
     }
 
@@ -136,13 +136,13 @@ export default function MintNft({
         account: activeAccount,
       });
 
-      console.log("Mint successful:", mintResponse);
+      console.log('Mint successful:', mintResponse);
 
       // Update database for this specific meme
-      const response = await fetch("/api/profile", {
-        method: "PUT",
+      const response = await fetch('/api/profile', {
+        method: 'PUT',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           address: wallet,
@@ -152,7 +152,7 @@ export default function MintNft({
       });
 
       if (!response.ok) {
-        throw new Error("Failed to update mint status in DB");
+        throw new Error('Failed to update mint status in DB');
       }
 
       setSuccess(true);
@@ -160,11 +160,11 @@ export default function MintNft({
       onMintComplete(true);
     } catch (error) {
       // @ts-expect-error ignore
-      if (error.message.includes("user rejected")) {
-        handleError(error, "Transaction was rejected by user");
+      if (error.message.includes('user rejected')) {
+        handleError(error, 'Transaction was rejected by user');
         // @ts-expect-error ignore
-      } else if (error.message.includes("insufficient funds")) {
-        handleError(error, "Insufficient funds to complete transaction");
+      } else if (error.message.includes('insufficient funds')) {
+        handleError(error, 'Insufficient funds to complete transaction');
       } else {
         // @ts-expect-error ignore
         handleError(error, `Failed to mint NFT: ${error.message}`);
@@ -217,7 +217,7 @@ export default function MintNft({
                       disabled={isButtonDisabled}
                       onClick={mint}
                     >
-                      {isCurrentMinting ? "Minting..." : "Mint"}
+                      {isCurrentMinting ? 'Minting...' : 'Mint'}
                     </Button>
                   )}
                 </div>

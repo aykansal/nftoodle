@@ -7,6 +7,14 @@ export interface nft {
   marketplaces: string;
 }
 
+export interface MemeData {
+  cloudinaryUrl: string;
+  createdAt: string; // ISO 8601 format string
+  id: number;
+  minted: boolean;
+  userAddress: string; // Ethereum address in string format
+}
+
 export interface tokenList {
   image_url: string;
 }
@@ -30,9 +38,9 @@ export interface CloudinaryUploadResponse {
   display_name: string;
   context: {
     custom: {
-         accountAddress: string
-    }
-},
+      accountAddress: string;
+    };
+  };
   url: string;
   secure_url: string;
 }

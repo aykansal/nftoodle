@@ -1,297 +1,146 @@
-// MyMemes.tsx
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import Image from 'next/image'
-import { motion } from "framer-motion"
-import { Card, CardContent } from "@/components/ui/card"
-import { Circle } from "lucide-react"
-import { useActiveAccount } from 'thirdweb/react'
-import MintNft from "@/components/thirdweb/MintNft"
+import axios from "axios";
+import Link from "next/link";
+import Image from "next/image";
+import { MemeData } from "@/lib/types";
+import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
+import { useActiveAccount } from "thirdweb/react";
+import { Triangle, Circle, Square } from "lucide-react";
+import { buttonVariants, cardVariants } from "@/styles/animations";
 
-interface Meme {
-  id: string
-  cloudinaryUrl: string
-  minted: boolean
-}
+export default function MyMemesPage() {
+  const [memes, setMemes] = useState<MemeData[]>([]);
+  const [loading, setLoading] = useState(true);
 
-export default function MyMemes() {
-  const [memes, setMemes] = useState<Meme[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [currentlyMinting, setCurrentlyMinting] = useState<string | null>(null)
-  const account = useActiveAccount()?.address
+  const activeUserAddress = useActiveAccount()?.address;
 
   useEffect(() => {
     const fetchMemes = async () => {
       try {
-        const response = await fetch('/api/profile?address=' + account)
-        const data = await response.json()
-        if (!response.ok) {
-          throw new Error('Failed to fetch memes')
-        }
-        setMemes(data.memes)
+        const response = await axios.get("/api/profile?address=" + activeUserAddress);
+        if (!response.data) throw new Error("Failed to fetch memes");
+        const data = await response.data.memes;
+        console.log(data);
+        setMemes(data);
       } catch (error) {
-        console.error('Error fetching memes:', error)
-        setMemes([])
+        console.error("Error fetching memes:", error);
       } finally {
-        setIsLoading(false)
+        setLoading(false);
       }
-    }
-    fetchMemes()
-  }, [account])
+    };
 
-  const handleMintStart = (memeId: string) => {
-    setCurrentlyMinting(memeId)
-  }
-
-  const handleMintComplete = async (memeId: string, success: boolean) => {
-    if (success) {
-      // Update local state
-      setMemes(prevMemes => 
-        prevMemes.map(meme => 
-          meme.id === memeId ? { ...meme, minted: true } : meme
-        )
-      )
-    }
-    setCurrentlyMinting(null)
-  }
-
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen bg-gray-900 text-white">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-        >
-          <Circle className="w-12 h-12 text-pink-500" />
-        </motion.div>
-      </div>
-    )
-  }
+    fetchMemes();
+  }, [activeUserAddress]);
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-      className="bg-gray-900 p-8 min-h-screen text-white"
-    >
-      <header className="mb-12 text-center">
+    <div className="min-h-[90vh] text-white p-8">
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="container mx-auto"
+      >
         <motion.h1
-          initial={{ y: -50 }}
-          animate={{ y: 0 }}
-          transition={{ type: "spring", bounce: 0.4 }}
-          className="mb-4 font-bold text-4xl text-pink-500 hover:text-pink-400 transition-colors"
-        >
-          My Meme Collection
-        </motion.h1>
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          className="text-green-400 text-xl hover:text-green-300 transition-colors"
-        >
-          Manage and Mint Your Squid Game Memes!
-        </motion.p>
-      </header>
-
-      {memes.length === 0 ? (
-        <motion.p
-          initial={{ scale: 0.8 }}
-          animate={{ scale: 1 }}
-          className="text-center text-green-400"
-        >
-          No memes generated yet.
-        </motion.p>
-      ) : (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="gap-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="text-5xl font-bold mb-16 text-center text-[#FF0B7A] font-squid"
         >
-          {memes.map((meme, index) => (
+          Your Memes
+        </motion.h1>
+
+        {loading ? (
+          <div className="flex justify-center items-center h-[60vh]">
             <motion.div
-              key={meme.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              whileHover={{ scale: 1.05, y: -5 }}
-              whileTap={{ scale: 0.95 }}
+              animate={{
+                rotate: [0, 360],
+                scale: [1, 1.2, 1],
+              }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                ease: "linear",
+              }}
+              className="flex justify-center items-center space-x-4"
             >
-              <Card className="border-2 border-pink-500 bg-gray-800 overflow-hidden hover:border-pink-400 transition-colors">
-                <CardContent className="relative p-0">
-                  <div className="relative aspect-square w-full overflow-hidden group">
-                    <Image
-                      src={meme.cloudinaryUrl}
-                      alt="Generated Meme"
-                      fill
-                      className="object-cover transition-transform duration-300 group-hover:scale-110"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-gray-900/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  </div>
-
-                  <motion.div
-                    className="p-4"
-                    whileHover={{ backgroundColor: 'rgba(0,0,0,0.1)' }}
-                  >
-                    <MintNft 
-                      name={'NFT Meme'} 
-                      description={`This meme is minted by ${account}`} 
-                      image={meme.cloudinaryUrl} 
-                      minted={meme.minted}
-                      memeId={meme.id}
-                      isMinting={currentlyMinting !== null}
-                      isCurrentMinting={currentlyMinting === meme.id}
-                      onMintStart={() => handleMintStart(meme.id)}
-                      // @ts-expect-error ignore
-                      onMintComplete={(success) => handleMintComplete(meme.id, success)}
-                    />
-                  </motion.div>
-                </CardContent>
-              </Card>
+              <Triangle className="w-12 h-12 text-[#FF0B7A]" />
+              <Circle className="w-12 h-12 text-green-400" />
+              <Square className="w-12 h-12 text-[#FF0B7A]" />
             </motion.div>
-          ))}
-        </motion.div>
-      )}
-    </motion.div>
-  )
+          </div>
+        ) : (
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={{
+              hidden: { opacity: 0 },
+              visible: {
+                opacity: 1,
+                transition: {
+                  staggerChildren: 0.1,
+                },
+              },
+            }}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+          >
+            {memes.length === 0 ? (
+              <motion.div
+                variants={cardVariants}
+                className="squid-card col-span-full p-12 text-center"
+              >
+                <h3 className="text-2xl font-bold text-[#FF0B7A] mb-4 font-ibm">
+                  No memes yet!
+                </h3>
+                <p className="text-gray-400 mb-8">
+                  Start creating your own memes or save some from the gallery.
+                </p>
+                <Link href="/platforms">
+                  <motion.button
+                    variants={buttonVariants}
+                    whileHover="hover"
+                    whileTap="tap"
+                    className="squid-button px-8 py-3 rounded-lg"
+                  >
+                    Create Meme
+                  </motion.button>
+                </Link>
+              </motion.div>
+            ) : (
+              memes?.map((meme, index) => (
+                <motion.div
+                  key={index}
+                  variants={cardVariants}
+                  whileHover="hover"
+                  className="squid-card overflow-hidden"
+                >
+                  <div className="p-6">
+                    <div className="relative aspect-square rounded-lg overflow-hidden">
+                      <Image
+                        src={meme.cloudinaryUrl}
+                        alt={`Meme ${index + 1}`}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    <div className="mt-4 flex justify-between items-center">
+                      <p className="text-gray-400 font-ibm">By {meme.userAddress.substring(0, 6) + '...'}</p>
+                      <motion.button
+                        variants={buttonVariants}
+                        whileHover="hover"
+                        whileTap="tap"
+                        className="squid-button px-4 py-2 rounded-lg text-sm"
+                      >
+                        Share
+                      </motion.button>
+                    </div>
+                  </div>
+                </motion.div>
+              ))
+            )}
+          </motion.div>
+        )}
+      </motion.div>
+    </div>
+  );
 }
-
-
-// 'use client'
-
-// import { useState, useEffect } from 'react'
-// import Image from 'next/image'
-// import { motion } from "framer-motion"
-// import { Card, CardContent } from "@/components/ui/card"
-// import { Circle } from "lucide-react"
-// import { useActiveAccount } from 'thirdweb/react'
-// import MintNft from "@/components/thirdweb/MintNft"
-
-
-// interface Meme {
-//   id: string
-//   cloudinaryUrl: string
-//   minted: boolean
-// }
-
-// export default function MyMemes() {
-//   const [memes, setMemes] = useState<Meme[]>([])
-//   const [isLoading, setIsLoading] = useState(true)
-//   const account = useActiveAccount()?.address
-
-//   console.log(account)
-//   useEffect(() => {
-//     const fetchMemes = async () => {
-//       try {
-//         const response = await fetch('/api/profile?address=' + account)
-//         const data = await response.json()
-//         console.log(data)
-//         if (!response.ok) {
-//           throw new Error('Failed to fetch memes')
-//         }
-
-//         console.log(data.memes[0].minted)
-//         setMemes(data.memes)
-
-//       } catch (error) {
-//         console.error('Error fetching memes:', error)
-//         setMemes([])
-//       } finally {
-//         setIsLoading(false)
-//       }
-//     }
-//     fetchMemes()
-//   }, [])
-
-//   if (isLoading) {
-//     return (
-//       <div className="flex justify-center items-center min-h-screen bg-gray-900 text-white">
-//         <motion.div
-//           animate={{ rotate: 360 }}
-//           transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-//         >
-//           <Circle className="w-12 h-12 text-pink-500" />
-//         </motion.div>
-//       </div>
-//     )
-//   }
-
-//   return (
-//     <motion.div
-//       initial={{ opacity: 0 }}
-//       animate={{ opacity: 1 }}
-//       transition={{ duration: 0.5 }}
-//       className="bg-gray-900 p-8 min-h-screen text-white"
-//     >
-//       <header className="mb-12 text-center">
-//         <motion.h1
-//           initial={{ y: -50 }}
-//           animate={{ y: 0 }}
-//           transition={{ type: "spring", bounce: 0.4 }}
-//           className="mb-4 font-bold text-4xl text-pink-500 hover:text-pink-400 transition-colors"
-//         >
-//           My Meme Collection
-//         </motion.h1>
-//         <motion.p
-//           initial={{ opacity: 0 }}
-//           animate={{ opacity: 1 }}
-//           transition={{ delay: 0.2 }}
-//           className="text-green-400 text-xl hover:text-green-300 transition-colors"
-//         >
-//           Manage and Mint Your Squid Game Memes!
-//         </motion.p>
-//       </header>
-
-//       {memes.length === 0 ? (
-//         <motion.p
-//           initial={{ scale: 0.8 }}
-//           animate={{ scale: 1 }}
-//           className="text-center text-green-400"
-//         >
-//           No memes generated yet.
-//         </motion.p>
-//       ) : (
-//         <motion.div
-//           initial={{ opacity: 0, y: 20 }}
-//           animate={{ opacity: 1, y: 0 }}
-//           transition={{ delay: 0.3 }}
-//           className="gap-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
-//         >
-//           {memes.map((meme, index) => (
-//             <motion.div
-//               key={meme.id}
-//               initial={{ opacity: 0, y: 20 }}
-//               animate={{ opacity: 1, y: 0 }}
-//               transition={{ delay: index * 0.1 }}
-//               whileHover={{ scale: 1.05, y: -5 }}
-//               whileTap={{ scale: 0.95 }}
-//             >
-//               <Card className="border-2 border-pink-500 bg-gray-800 overflow-hidden hover:border-pink-400 transition-colors">
-//                 <CardContent className="relative p-0">
-//                   <div className="relative aspect-square w-full overflow-hidden group">
-//                     <Image
-//                       src={meme.cloudinaryUrl}
-//                       alt="Generated Meme"
-//                       fill
-//                       className="object-cover transition-transform duration-300 group-hover:scale-110"
-//                     />
-//                     <div className="absolute inset-0 bg-gradient-to-t from-gray-900/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-//                   </div>
-
-//                   <motion.div
-//                     className="p-4"
-//                     whileHover={{ backgroundColor: 'rgba(0,0,0,0.1)' }}
-//                   >
-//                     <MintNft name={'NFT Meme'} description={`This meme is minted by ${account}`} image={meme.cloudinaryUrl} minted={meme.minted} />
-//                   </motion.div>
-//                 </CardContent>
-//               </Card>
-//             </motion.div>
-//           ))}
-//         </motion.div>
-//       )}
-//     </motion.div>
-//   )
-// }
