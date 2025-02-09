@@ -94,7 +94,7 @@ export default function MintNft({
       onMintComplete(false);
       return;
     }
-    console.log(message, error);
+    console.log('err in handleError MinNft.tsx', message, error);
     setError(message);
     onMintComplete(false);
   };

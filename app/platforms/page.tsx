@@ -31,18 +31,18 @@ const platforms = [
 
 export default function PlatformsPage() {
   return (
-    <div className="min-h-[90vh] text-white p-8">
+    <div className="p-8 min-h-[90vh] text-white">
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.3 }}
-        className="container mx-auto"
+        className="mx-auto container"
       >
         <motion.h1
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          className="text-5xl font-bold mb-16 text-center text-[#FF0B7A] font-squid"
+          className="mb-16 font-bold font-squid text-[#FF0B7A] text-5xl text-center"
         >
           Select Platform
         </motion.h1>
@@ -51,14 +51,14 @@ export default function PlatformsPage() {
           initial="hidden"
           animate="visible"
           variants={containerVariants}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+          className="gap-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
         >
           {platforms.map((platform) => (
             <motion.div
               key={platform.id}
               variants={cardVariants}
               whileHover="hover"
-              className="squid-card overflow-hidden will-change-transform"
+              className="will-change-transform overflow-hidden squid-card"
             >
               <Link href={platform.route} className="block p-6">
                 <div className="flex flex-col items-center space-y-4">
@@ -72,15 +72,15 @@ export default function PlatformsPage() {
                       priority={platform.id <= 2}
                     />
                   </div>
-                  <h2 className="text-2xl font-bold text-[#FF0B7A] font-ibm">
+                  <h2 className="font-bold font-ibm text-[#FF0B7A] text-2xl">
                     {platform.name}
                   </h2>
-                  <p className="text-gray-400 text-center">{platform.description}</p>
+                  <p className="text-center text-gray-400">{platform.description}</p>
                   <motion.button
                     variants={buttonVariants}
                     whileHover="hover"
                     whileTap="tap"
-                    className="squid-button px-6 py-2 rounded-lg mt-4 will-change-transform"
+                    className="mt-4 px-6 py-2 rounded-lg will-change-transform squid-button"
                   >
                     View NFTs
                   </motion.button>

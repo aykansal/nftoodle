@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import axios from 'axios';
 import Link from 'next/link';
@@ -26,9 +26,8 @@ export default function CreatePage() {
   const [totalPages, setTotalPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
 
-  // const getCachedData = (page: number): string[] | null => {
   const getCachedData = (page: number): string[] | null => {
-    console.log(page);
+    console.log('cached-data:', page);
     const cached = localStorage.getItem(CACHE_KEY);
     if (!cached) return null;
 
@@ -55,7 +54,7 @@ export default function CreatePage() {
     localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
   };
 
-  const fetchPageData = async (page: number) => {
+  const fetchPageData = useCallback(async (page: number) => {
     setLoading(true);
     try {
       const cachedData = getCachedData(page);
@@ -86,7 +85,7 @@ export default function CreatePage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   const handlePageChange = async (newPage: number) => {
     if (newPage === currentPage) return;
@@ -114,7 +113,7 @@ export default function CreatePage() {
   };
 
   return (
-    <div className="relative p-8 min-h-screen h-full text-white overflow-hidden">
+    <div className="relative p-8 h-full min-h-screen text-white overflow-hidden">
       <motion.div
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
@@ -124,7 +123,7 @@ export default function CreatePage() {
         <h1 className="mb-3 font-bold text-[#FF0B7A] text-5xl">
           Select an NFT to Memeify
         </h1>
-        <p className="text-[#45D62E] font-ibm text-xl ">
+        <p className="font-ibm text-[#45D62E] text-xl">
           Choose your favorite NFT and turn it into a hilarious meme!
         </p>
       </motion.div>

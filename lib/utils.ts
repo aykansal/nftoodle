@@ -22,7 +22,7 @@ export async function fetchOpenSeaCollection(
     })
     .then((res) => res.data.nfts)
     .catch((error) => {
-      console.log(error.message);
+      console.log("err in fetchOpenSeaCollection",error.message);
     });
   const imageUrls = fetchedImages?.map(
     (item: NFTItem) => item?.media[0].thumbnail

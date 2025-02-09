@@ -5,6 +5,7 @@ import axios from 'axios';
 import { motion } from 'framer-motion';
 import { ImagePlus, Type, Wand2, Palette } from 'lucide-react';
 import { useActiveAccount } from 'thirdweb/react';
+import { useToast } from "@/hooks/use-toast";
 
 import type { MemeGeneratorProps } from '@/lib/types';
 import { squidGameVariants, tabVariants } from '@/lib/data';
@@ -37,6 +38,9 @@ export function MemeGenerator({ defaultImage }: MemeGeneratorProps) {
   // const [isDownloading, setIsDownloading] = useState(false);
   // const [isSharing, setIsSharing] = useState(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
+  const { toast } = useToast();
+  const [hasEdited, setHasEdited] = useState(false);
+  const [lastSavedState, setLastSavedState] = useState('');
 
   const accountAddress = useActiveAccount()?.address;
 
@@ -47,6 +51,23 @@ export function MemeGenerator({ defaultImage }: MemeGeneratorProps) {
     img.src = defaultImage;
     img.onload = () => setImage(img);
   }, [defaultImage]);
+
+  // Add this effect to track edits
+  useEffect(() => {
+    const currentState = JSON.stringify({
+      topText,
+      bottomText,
+      fontSize,
+      textColor,
+      textEffect,
+      imageFilter,
+      backgroundColor
+    });
+    
+    if (lastSavedState && currentState !== lastSavedState) {
+      setHasEdited(true);
+    }
+  }, [topText, bottomText, fontSize, textColor, textEffect, imageFilter, backgroundColor, lastSavedState]);
 
   // Canvas rendering logic
   useEffect(() => {
@@ -138,23 +159,53 @@ export function MemeGenerator({ defaultImage }: MemeGeneratorProps) {
   //   setIsDownloading(false);
   // };
   const handleSave = async () => {
+    if (!hasEdited) {
+      toast({
+        title: "No changes detected",
+        description: "Please edit the meme before saving.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSaving(true);
     const canvas = canvasRef.current;
     if (!canvas) return;
 
     const imageDataUrl = canvas.toDataURL('image/png');
-
+    
     try {
-      const { status } = await axios.post('/api/memes', {
+      const response = await axios.post('/api/memes', {
         imageDataUrl,
         accountAddress,
+        originalImage: defaultImage, // Send original image URL for tracking
       });
-      console.log(
-        status === 200
-          ? 'Image uploaded successfully'
-          : `Upload failed with status ${status}`
-      );
-    } catch (error) {
+
+      if (response.status === 201) {
+        toast({
+          title: "Success!",
+          description: "Your meme has been saved to the gallery.",
+          variant: "default",
+        });
+        
+        // Update last saved state
+        setLastSavedState(JSON.stringify({
+          topText,
+          bottomText,
+          fontSize,
+          textColor,
+          textEffect,
+          imageFilter,
+          backgroundColor
+        }));
+        setHasEdited(false);
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.response?.data?.error || "Failed to save meme. Please try again.",
+        variant: "destructive",
+      });
       console.error('Error during image upload:', error);
     } finally {
       setIsSaving(false);
@@ -167,21 +218,21 @@ export function MemeGenerator({ defaultImage }: MemeGeneratorProps) {
       animate="visible"
       exit="exit"
       variants={squidGameVariants}
-      className="grid md:grid-cols-[2fr,1fr] gap-6 p-4 md:p-8 rounded-xl text-white"
+      className="gap-6 grid md:grid-cols-[2fr,1fr] p-4 md:p-8 rounded-xl text-white"
     >
       {/* Left Side (Canvas and Actions) */}
       <motion.div
         variants={cardVariants}
         initial="initial"
         animate="visible"
-        className="squid-card rounded-xl overflow-hidden"
+        className="rounded-xl overflow-hidden squid-card"
       >
         <div className="space-y-6 p-4 md:p-6">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5 }}
-            className="relative w-full max-w-[540px] mx-auto flex items-center justify-center rounded-lg overflow-hidden bg-gray-900/50"
+            className="relative flex justify-center items-center bg-gray-900/50 mx-auto rounded-lg w-full max-w-[540px] overflow-hidden"
           >
             <canvas
               ref={canvasRef}
@@ -193,7 +244,7 @@ export function MemeGenerator({ defaultImage }: MemeGeneratorProps) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="flex flex-wrap gap-3 justify-center"
+            className="flex flex-wrap justify-center gap-3"
           >
             <motion.button
               variants={buttonVariants}
@@ -205,7 +256,7 @@ export function MemeGenerator({ defaultImage }: MemeGeneratorProps) {
               whileTap={{ scale: 0.95 }}
               onClick={handleSave}
               disabled={isSaving}
-              className="squid-button px-6 py-2.5 text-lg rounded-lg will-change-transform bg-gradient-to-r from-[#FF0B7A] to-[#FF0B7A]/80 hover:from-[#FF0B7A]/90 hover:to-[#FF0B7A]/70 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-gradient-to-r from-[#FF0B7A] hover:from-[#FF0B7A]/90 to-[#FF0B7A]/80 hover:to-[#FF0B7A]/70 disabled:opacity-50 px-6 py-2.5 rounded-lg text-lg will-change-transform disabled:cursor-not-allowed squid-button"
             >
               {isSaving ? 'Saving...' : 'Save Meme'}
             </motion.button>
@@ -218,11 +269,11 @@ export function MemeGenerator({ defaultImage }: MemeGeneratorProps) {
         variants={cardVariants}
         initial="initial"
         animate="visible"
-        className="squid-card rounded-xl overflow-hidden"
+        className="rounded-xl overflow-hidden squid-card"
       >
-        <div className="p-4 md:p-6 space-y-6">
+        <div className="space-y-6 p-4 md:p-6">
           <Tabs defaultValue="text" className="w-full">
-            <TabsList className="grid grid-cols-3 gap-x-2 mb-6">
+            <TabsList className="gap-x-2 grid grid-cols-3 mb-6">
               <TabsTrigger
                 value="text"
                 onClick={() => setActiveTab('text')}
@@ -232,7 +283,7 @@ export function MemeGenerator({ defaultImage }: MemeGeneratorProps) {
                     : 'text-[#FF0B7A] hover:bg-[#FF0B7A]/10'
                 }`}
               >
-                <Type className="w-5 h-5 mr-1.5" />
+                <Type className="mr-1.5 w-5 h-5" />
                 <span className="mt-0.5">Text</span>
               </TabsTrigger>
               <TabsTrigger
@@ -244,7 +295,7 @@ export function MemeGenerator({ defaultImage }: MemeGeneratorProps) {
                     : 'text-[#FF0B7A] hover:bg-[#FF0B7A]/10'
                 }`}
               >
-                <Wand2 className="w-5 h-5 mr-1.5" />
+                <Wand2 className="mr-1.5 w-5 h-5" />
                 <span className="mt-0.5">Effects</span>
               </TabsTrigger>
               <TabsTrigger
@@ -256,7 +307,7 @@ export function MemeGenerator({ defaultImage }: MemeGeneratorProps) {
                     : 'text-[#FF0B7A] hover:bg-[#FF0B7A]/10'
                 }`}
               >
-                <Palette className="w-5 h-5 mr-1.5" />
+                <Palette className="mr-1.5 w-5 h-5" />
                 <span className="mt-0.5">BG</span>
               </TabsTrigger>
             </TabsList>
@@ -269,7 +320,7 @@ export function MemeGenerator({ defaultImage }: MemeGeneratorProps) {
                     type="text"
                     value={topText}
                     onChange={(e) => setTopText(e.target.value)}
-                    className="bg-gray-800/50 border-[#FF0B7A]/30 focus:border-[#FF0B7A] transition-colors"
+                    className="border-[#FF0B7A]/30 focus:border-[#FF0B7A] bg-gray-800/50 transition-colors"
                   />
                 </div>
                 <div className="space-y-2">
@@ -278,7 +329,7 @@ export function MemeGenerator({ defaultImage }: MemeGeneratorProps) {
                     type="text"
                     value={bottomText}
                     onChange={(e) => setBottomText(e.target.value)}
-                    className="bg-gray-800/50 border-[#FF0B7A]/30 focus:border-[#FF0B7A] transition-colors"
+                    className="border-[#FF0B7A]/30 focus:border-[#FF0B7A] bg-gray-800/50 transition-colors"
                   />
                 </div>
                 <div className="space-y-2">
@@ -298,13 +349,13 @@ export function MemeGenerator({ defaultImage }: MemeGeneratorProps) {
                     type="color"
                     value={textColor}
                     onChange={(e) => setTextColor(e.target.value)}
-                    className="h-12 p-1 bg-gray-800/50 border-[#FF0B7A]/30 focus:border-[#FF0B7A] transition-colors"
+                    className="border-[#FF0B7A]/30 focus:border-[#FF0B7A] bg-gray-800/50 p-1 h-12 transition-colors"
                   />
                 </div>
                 <div className="space-y-2">
                   <Label>Text Effect</Label>
                   <Select value={textEffect} onValueChange={setTextEffect}>
-                    <SelectTrigger className="bg-gray-800/50 border-[#FF0B7A]/30 focus:border-[#FF0B7A]">
+                    <SelectTrigger className="border-[#FF0B7A]/30 focus:border-[#FF0B7A] bg-gray-800/50">
                       <SelectValue placeholder="Select effect" />
                     </SelectTrigger>
                     <SelectContent>
@@ -321,7 +372,7 @@ export function MemeGenerator({ defaultImage }: MemeGeneratorProps) {
                 <div className="space-y-2">
                   <Label>Image Filter</Label>
                   <Select value={imageFilter} onValueChange={setImageFilter}>
-                    <SelectTrigger className="bg-gray-800/50 border-[#FF0B7A]/30 focus:border-[#FF0B7A]">
+                    <SelectTrigger className="border-[#FF0B7A]/30 focus:border-[#FF0B7A] bg-gray-800/50">
                       <SelectValue placeholder="Select filter" />
                     </SelectTrigger>
                     <SelectContent>
@@ -344,7 +395,7 @@ export function MemeGenerator({ defaultImage }: MemeGeneratorProps) {
                     type="color"
                     value={backgroundColor}
                     onChange={(e) => setBackgroundColor(e.target.value)}
-                    className="h-12 p-1 bg-gray-800/50 border-[#FF0B7A]/30 focus:border-[#FF0B7A] transition-colors"
+                    className="border-[#FF0B7A]/30 focus:border-[#FF0B7A] bg-gray-800/50 p-1 h-12 transition-colors"
                   />
                 </div>
               </div>
@@ -370,7 +421,7 @@ export function MemeGenerator({ defaultImage }: MemeGeneratorProps) {
 //     <>
 //       <Button
 //         onClick={handleSave}
-//         className="bg-pink-500 hover:bg-pink-600 text-white font-ibm"
+//         className="bg-pink-500 hover:bg-pink-600 font-ibm text-white"
 //         disabled={isSaving}
 //       >
 //         {isSaving ? (

@@ -1,6 +1,14 @@
 import axios from 'axios';
 
+/**
+ * Fetches Bazar tokens and converts them to Arweave URLs
+ * @param {string[]} excludedTokens - Array of token IDs to exclude from results
+ * @returns {Promise<string[]>} Array of Arweave URLs for the tokens
+ */
 export const fetchBazarTokens = async (excludedTokens = []) => {
+  const PROCESS_ID = 'U3TjJAZWJjlWBB4KAXSHKzuky81jtyh0zqH8rUL4Wd0';
+  const API_URL = `https://cu111.ao-testnet.xyz/dry-run?process-id=${PROCESS_ID}`;
+
   try {
     // const result = await dryrun({
     //   process: 'U3TjJAZWJjlWBB4KAXSHKzuky81jtyh0zqH8rUL4Wd0',
@@ -8,46 +16,30 @@ export const fetchBazarTokens = async (excludedTokens = []) => {
     //   tags: [{ name: "Action", value: "Info" }],
     // });
 
-    const result = await axios.post(
-      'https://cu111.ao-testnet.xyz/dry-run?process-id=U3TjJAZWJjlWBB4KAXSHKzuky81jtyh0zqH8rUL4Wd0',
-      {
-        Owner: '123456789',
-        Target: 'U3TjJAZWJjlWBB4KAXSHKzuky81jtyh0zqH8rUL4Wd0',
-        Tags: [
-          {
-            name: 'Action',
-            value: 'Info',
-          },
-        ],
-      }
-    );
-
-    const asset = JSON.parse(result?.data?.Messages[0]?.Data);
-    const some = [];
-    asset.Orderbook.forEach((element) => {
-      some.push(element.Orders);
+    const response = await axios.post(API_URL, {
+      Owner: '123456789',
+      Target: PROCESS_ID,
+      Tags: [
+        {
+          name: 'Action',
+          value: 'Info',
+        },
+      ],
     });
 
-    let tokens = [];
-    some.forEach((element) => {
-      element.forEach((order) => {
-        tokens.push(order.Token);
-      });
-    });
+    const orderbook = JSON.parse(response?.data?.Messages[0]?.Data);
 
-    const filteredTokens = tokens.filter(
-      (token) => !excludedTokens.includes(token)
-    );
-    const uniqueTokens = [...new Set(filteredTokens)];
+    // Extract all tokens using modern array methods
+    const tokens = orderbook.Orderbook
+      .flatMap(item => item.Orders)
+      .map(order => order.Token)
+      .filter(token => !excludedTokens.includes(token));
 
-    // Convert token IDs to Arweave URLs
-    const bazarTokenUrls = uniqueTokens.map(
-      (token) => `https://arweave.net/${token}`
-    );
-
-    return bazarTokenUrls;
+    // Remove duplicates
+    const uniqueTokens = [...new Set(tokens)];
+    return uniqueTokens.map(token => `https://arweave.net/${token}`);
   } catch (error) {
-    console.error(error);
+    console.error('Error fetching Bazar tokens:', error.message);
     return [];
   }
 };

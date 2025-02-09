@@ -7,10 +7,11 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
-import usePagination from '@/hooks/usePagination';
+// import usePagination from '@/hooks/usePagination';
 import { Triangle, Circle, Square } from 'lucide-react';
-import { verifyValidImages } from '@/lib/verify';
+// import { verifyValidImages } from '@/lib/verify';
 import Image from 'next/image';
+import axios from 'axios';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -54,12 +55,9 @@ export default function PlatformPage() {
   const [loading, setLoading] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
   const { toast } = useToast();
-
-  const { currentItems, currentPage, handlePageChange, totalPages } =
-    usePagination({
-      items: nfts,
-      itemsPerPage: 12,
-    });
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [, setTotal] = useState(0);
 
   useEffect(() => {
     setIsMounted(true);
@@ -68,29 +66,37 @@ export default function PlatformPage() {
   useEffect(() => {
     const fetchNFTs = async () => {
       try {
-        const response = await fetch(`/api/nfts/${platform}`);
-        if (!response.ok) throw new Error('Failed to fetch NFTs');
-        const data = await response.json();
-        const verifiedUrls = await verifyValidImages(data.urls);
-        setNfts(verifiedUrls);
+        const response = await axios.get(
+          `/api/nfts/${platform}?page=${currentPage}&limit=12`
+        );
+        if (!response.data) throw new Error('Failed to fetch NFTs');
+        const data = await response.data;
+        setNfts(data.urls);
+        setTotalPages(data.totalPages);
+        setTotal(data.total);
       } catch (error) {
         toast({
           title: 'Error',
           description: 'Failed to fetch NFTs. Please try again later.',
           variant: 'destructive',
         });
-        console.log(error);
+        console.log(`err in fetching from platform ${platform}: `, error);
       } finally {
         setLoading(false);
       }
     };
 
     fetchNFTs();
-  }, [platform, toast]);
+  }, [platform, currentPage, toast]);
 
   const handleNftClick = (imageUrl: string) => {
     const encodedUrl = encodeURIComponent(imageUrl);
     router.push(`/create/meme?imageUrl=${encodedUrl}`);
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+    setLoading(true);
   };
 
   const platformTitle =
@@ -121,17 +127,17 @@ export default function PlatformPage() {
               <Circle className="w-12 h-12 text-green-400" />
               <Square className="w-12 h-12 text-[#FF0B7A]" />
             </motion.div>
-            <p className="text-white text-xl font-ibm">Loading...</p>
+            <p className="font-ibm text-white text-xl">Loading...</p>
           </motion.div>
         )}
       </AnimatePresence>
 
-      <div className="container mx-auto py-20 px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto px-4 sm:px-6 lg:px-8 py-20 container">
         <div className="flex justify-between items-center mb-16">
           <motion.h1
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="text-5xl font-bold text-[#FF0B7A] font-ibm"
+            className="font-bold font-ibm text-[#FF0B7A] text-5xl"
           >
             {platformTitle} NFTs
           </motion.h1>
@@ -142,7 +148,7 @@ export default function PlatformPage() {
             <Button
               variant="outline"
               onClick={() => window.history.back()}
-              className="border-2 border-gray-700 hover:border-pink-500 bg-gray-800/50 backdrop-blur-sm text-white px-6 py-2 text-lg"
+              className="border-2 border-gray-700 hover:border-pink-500 bg-gray-800/50 backdrop-blur-sm px-6 py-2 text-lg text-white"
             >
               Back to Platforms
             </Button>
@@ -153,35 +159,38 @@ export default function PlatformPage() {
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"
+          className="gap-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
         >
           <AnimatePresence mode="wait">
             {loading
               ? Array.from({ length: 12 }).map((_, i) => (
                   <Card
                     key={`skeleton-${i}`}
-                    className="bg-gray-800/50 border-2 border-gray-700 p-4 aspect-square backdrop-blur-sm"
+                    className="border-2 border-gray-700 bg-gray-800/50 backdrop-blur-sm p-4 aspect-square"
                   >
-                    <Skeleton className="w-full h-full bg-gray-700/50" />
+                    <Skeleton className="bg-gray-700/50 w-full h-full" />
                   </Card>
                 ))
-              : currentItems.map((nft, index) => (
+              : nfts.map((nft, index) => (
                   <motion.div
                     key={`${nft}-${index}`}
                     variants={cardVariants}
                     initial="initial"
                     animate="visible"
                     whileHover="hover"
-                    className="squid-card p-4 cursor-pointer"
+                    className="p-4 cursor-pointer squid-card"
                     onClick={() => handleNftClick(nft)}
                   >
-                    <Image
-                      src={nft}
-                      alt="NFT"
-                      width={400}
-                      height={400}
-                      className="w-full h-auto rounded-lg"
-                    />
+                    <div className="relative rounded-lg overflow-hidden aspect-square">
+                      <Image
+                        src={nft}
+                        alt="NFT"
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        className="object-cover"
+                        priority={index < 4}
+                      />
+                    </div>
                   </motion.div>
                 ))}
           </AnimatePresence>
@@ -197,11 +206,11 @@ export default function PlatformPage() {
               whileTap="tap"
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
-              className="squid-button px-6 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              className="disabled:opacity-50 px-6 py-2 rounded-lg disabled:cursor-not-allowed squid-button"
             >
               Previous
             </motion.button>
-            <span className="flex items-center px-6 text-lg font-ibm">
+            <span className="flex items-center px-6 font-ibm text-lg">
               Page {currentPage} of {totalPages}
             </span>
             <motion.button
@@ -212,7 +221,7 @@ export default function PlatformPage() {
               whileTap="tap"
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className="squid-button px-6 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              className="disabled:opacity-50 px-6 py-2 rounded-lg disabled:cursor-not-allowed squid-button"
             >
               Next
             </motion.button>

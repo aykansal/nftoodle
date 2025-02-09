@@ -11,25 +11,29 @@ datasource db {
 model meme {
   id            Int      @id @default(autoincrement())
   cloudinaryUrl String   @unique
+  originalImage String
   createdAt     DateTime @default(now())
   minted        Boolean? @default(false)
-  User          User?    @relation(fields: [userAddress], references: [userWallet])
+  User          user?    @relation(fields: [userAddress], references: [userWallet])
   userAddress   String?
 }
 
-model LastUpdate {
-  id        Int      @id @default(autoincrement())
-  updatedAt DateTime @default(now()) @updatedAt
-}
-
-model User {
+model user {
   id         Int      @id @default(autoincrement())
   userWallet String   @unique
   memes      meme[]
   createdAt  DateTime @default(now())
 }
 
-model nft {
-  id      Int    @id @default(autoincrement())
-  nftUrls String @unique
+model nfts {
+  id        Int       @id @default(autoincrement())
+  sourceUrl String    @unique
+  verified  Boolean   @default(false)
+  platform  Platforms
+}
+
+enum Platforms {
+  bazar
+  opensea
+  unleash
 }
