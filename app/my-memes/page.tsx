@@ -22,11 +22,10 @@ export default function MyMemesPage() {
     const fetchMemes = async () => {
       try {
         const response = await axios.get(
-          '/api/profile?address=' + activeUserAddress
+          `/api/profile/${activeUserAddress}`
         );
         if (!response.data) throw new Error('Failed to fetch memes');
         const data = await response.data.memes;
-        console.log('my-memes',data);
         setMemes(data);
       } catch (error) {
         console.error('Error fetching memes:', error);
@@ -147,8 +146,8 @@ export default function MyMemesPage() {
                         memeId={meme.id}
                         isMinting={false}
                         isCurrentMinting={false}
-                        onMintStart={() => {}}
-                        onMintComplete={() => {}}
+                        onMintStart={() => { }}
+                        onMintComplete={() => { }}
                       />
                     </div>
                   </div>

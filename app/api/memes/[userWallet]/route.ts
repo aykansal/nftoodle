@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-export async function GET(request: NextRequest,
-  { params }: { params: { address: string } }
+export async function GET(req: NextRequest,
+  { params }: { params: { userWallet: string } }
 ) {
   try {
-    const { address } = params;
-
-    if (!address) {
+    const { userWallet } = params;
+    if (!userWallet) {
       return NextResponse.json(
         { error: 'Address is required' },
         { status: 400 }
@@ -16,10 +15,10 @@ export async function GET(request: NextRequest,
 
     const userWithMemes = await prisma.user.findUnique({
       where: {
-        userWallet: address,
+        userWallet,
       },
       include: {
-        memes: true, // Include related memes
+        memes: true,
       },
     });
 
@@ -40,28 +39,27 @@ export async function GET(request: NextRequest,
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
-    const { address, hasMinted } = body;
+    const { userWallet, hasMinted } = body;
 
-    if (!address) {
+    if (!userWallet) {
       return NextResponse.json(
         { error: 'Address is required' },
         { status: 400 }
       );
     }
 
-    // Find the user first
-    const user = await prisma.user.findUnique({
-      where: { userWallet: address },
-      include: { memes: true },
-    });
-
-    if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    }
-    const updatedMemes = await prisma.meme.updateMany({
-      where: { userAddress: address },
-      data: { minted: hasMinted },
-    });
+    const updatedMemes =
+      await prisma.user.findUnique({
+        where: { userWallet },
+        include: { memes: true },
+      }).then(async (user) => {
+        await prisma.meme.updateMany({
+          where: { userWallet: user?.userWallet },
+          data: { minted: hasMinted },
+        });
+      }).catch((error) => {
+        return NextResponse.json({ message: 'User not found', error }, { status: 404 });
+      })
 
     return NextResponse.json({ success: true, updatedMemes }, { status: 200 });
   } catch (error) {

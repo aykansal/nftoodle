@@ -1,32 +1,32 @@
-import "@/styles/globals.css";
-import type { Metadata } from "next";
-import localFont from "next/font/local";
-import Header  from "@/components/header";
+import '@/styles/globals.css';
+import type { Metadata } from 'next';
+import localFont from 'next/font/local';
+import Header from '@/components/header';
 import { ThirdwebProvider } from 'thirdweb/react';
-import AuthProvider from '@/components/AuthProvider';
 import { Toaster } from '@/components/ui/sonner';
 import { BaseLayout } from '@/components/layout/base-layout';
-import Footer from "@/components/Footer";
+import Footer from '@/components/Footer';
+import AuthProvider from '@/components/AuthProvider';
 
 const squid = localFont({
-  src: "./fonts/squid.woff",
-  variable: "--font-squid",
+  src: './fonts/squid.woff',
+  variable: '--font-squid',
   preload: true,
-  display: "swap",
+  display: 'swap',
   weight: '100 900',
 });
 
 const ibm = localFont({
-  src: "./fonts/IBMPlexMono-Medium.ttf",
-  variable: "--font-ibm-plex-mono",
+  src: './fonts/IBMPlexMono-Medium.ttf',
+  variable: '--font-ibm-plex-mono',
   preload: true,
-  display: "swap",
+  display: 'swap',
   weight: '100 900',
 });
 
 export const metadata: Metadata = {
-  title: "NFToodle - Squid Game NFT Platform",
-  description: "Create and share NFT memes with Squid Game theme",
+  title: 'NFToodle - Squid Game NFT Platform',
+  description: 'Create and share NFT memes with Squid Game theme',
 };
 
 export default function RootLayout({

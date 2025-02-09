@@ -14,8 +14,8 @@ model meme {
   originalImage String
   createdAt     DateTime @default(now())
   minted        Boolean? @default(false)
-  User          user?    @relation(fields: [userAddress], references: [userWallet])
-  userAddress   String?
+  user          user     @relation(fields: [userWallet], references: [userWallet])
+  userWallet    String
 }
 
 model user {

@@ -1,16 +1,23 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
+import { toast } from 'sonner';
 
 const XShareButton = ({ imageUrl }: { imageUrl: string }) => {
   const shareOnTwitter = () => {
-    const tweetContent = encodeURIComponent(
-      `I have created this Meme of NFT! Make your own at https://nftoodle.ayverse.me.\n\n` +
-        `Check out my meme:\n${imageUrl}\n\n` +
-        `credits: @aykansal & @satyanshmittal`
-    );
-    const twitterUrl = `https://twitter.com/intent/tweet?text=${tweetContent}`;
-    window.open(twitterUrl, '_blank');
+    try {
+      const tweetContent = encodeURIComponent(
+        `I have created this Meme of NFT! Make your own at https://nftoodle.ayverse.me.\n\n` +
+          `Check out my meme:\n${imageUrl}\n\n` +
+          `credits: @aykansal & @satyanshmittal`
+      );
+      const twitterUrl = `https://twitter.com/intent/tweet?text=${tweetContent}`;
+      window.open(twitterUrl, '_blank');
+      toast.success('Opening X to share your meme! 🎉');
+    } catch (error) {
+      console.error('Error sharing to X:', error);
+      toast.error('Failed to share on X. Please try again.');
+    }
   };
 
   return (

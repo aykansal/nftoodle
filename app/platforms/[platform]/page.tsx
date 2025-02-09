@@ -6,7 +6,6 @@ import { useParams, useRouter } from 'next/navigation';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useToast } from '@/hooks/use-toast';
 // import usePagination from '@/hooks/usePagination';
 import { Triangle, Circle, Square } from 'lucide-react';
 // import { verifyValidImages } from '@/lib/verify';
@@ -54,7 +53,6 @@ export default function PlatformPage() {
   const [nfts, setNfts] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
-  const { toast } = useToast();
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [, setTotal] = useState(0);
@@ -75,11 +73,6 @@ export default function PlatformPage() {
         setTotalPages(data.totalPages);
         setTotal(data.total);
       } catch (error) {
-        toast({
-          title: 'Error',
-          description: 'Failed to fetch NFTs. Please try again later.',
-          variant: 'destructive',
-        });
         console.log(`err in fetching from platform ${platform}: `, error);
       } finally {
         setLoading(false);
@@ -87,7 +80,7 @@ export default function PlatformPage() {
     };
 
     fetchNFTs();
-  }, [platform, currentPage, toast]);
+  }, [platform, currentPage]);
 
   const handleNftClick = (imageUrl: string) => {
     const encodedUrl = encodeURIComponent(imageUrl);

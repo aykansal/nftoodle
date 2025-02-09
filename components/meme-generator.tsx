@@ -5,7 +5,6 @@ import axios from 'axios';
 import { motion } from 'framer-motion';
 import { Type, Wand2, Palette } from 'lucide-react';
 import { useActiveAccount } from 'thirdweb/react';
-import { useToast } from "@/hooks/use-toast";
 
 import type { MemeGeneratorProps } from '@/lib/types';
 import { squidGameVariants } from '@/lib/data';
@@ -19,10 +18,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { buttonVariants, cardVariants } from '@/styles/animations';
 import { Label } from './ui/label';
 import { Input } from './ui/input';
-// import { Card, CardContent } from '@/components/ui/card';
-import { buttonVariants, cardVariants } from '@/styles/animations';
+import { toast } from 'sonner';
 
 export function MemeGenerator({ defaultImage }: MemeGeneratorProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -35,15 +34,9 @@ export function MemeGenerator({ defaultImage }: MemeGeneratorProps) {
   const [imageFilter, setImageFilter] = useState('none');
   const [backgroundColor, setBackgroundColor] = useState('#000000');
   const [activeTab, setActiveTab] = useState('text');
-  // const [isDownloading, setIsDownloading] = useState(false);
-  // const [isSharing, setIsSharing] = useState(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
-  const { toast } = useToast();
-  const [hasEdited, setHasEdited] = useState(false);
-  const [lastSavedState, setLastSavedState] = useState('');
 
-  const accountAddress = useActiveAccount()?.address;
-
+  const userWallet = useActiveAccount()?.address;
   // Loading image
   useEffect(() => {
     const img = new Image();
@@ -51,23 +44,6 @@ export function MemeGenerator({ defaultImage }: MemeGeneratorProps) {
     img.src = defaultImage;
     img.onload = () => setImage(img);
   }, [defaultImage]);
-
-  // Add this effect to track edits
-  useEffect(() => {
-    const currentState = JSON.stringify({
-      topText,
-      bottomText,
-      fontSize,
-      textColor,
-      textEffect,
-      imageFilter,
-      backgroundColor
-    });
-    
-    if (lastSavedState && currentState !== lastSavedState) {
-      setHasEdited(true);
-    }
-  }, [topText, bottomText, fontSize, textColor, textEffect, imageFilter, backgroundColor, lastSavedState]);
 
   // Canvas rendering logic
   useEffect(() => {
@@ -149,64 +125,33 @@ export function MemeGenerator({ defaultImage }: MemeGeneratorProps) {
   //   setIsDownloading(true);
   //   const canvas = canvasRef.current;
   //   if (!canvas) return;
-
   //   await new Promise((resolve) => setTimeout(resolve, 800));
-
   //   const link = document.createElement("a");
   //   link.download = "meme.png";
   //   link.href = canvas.toDataURL("image/png");
   //   link.click();
   //   setIsDownloading(false);
   // };
-  const handleSave = async () => {
-    if (!hasEdited) {
-      toast({
-        title: "No changes detected",
-        description: "Please edit the meme before saving.",
-        variant: "destructive",
-      });
-      return;
-    }
 
+  const handleSave = async () => {
     setIsSaving(true);
     const canvas = canvasRef.current;
     if (!canvas) return;
 
     const imageDataUrl = canvas.toDataURL('image/png');
-    
+
     try {
       const response = await axios.post('/api/memes', {
         imageDataUrl,
-        accountAddress,
-        originalImage: defaultImage, // Send original image URL for tracking
+        userWallet,
+        originalImage: defaultImage, 
       });
 
       if (response.status === 201) {
-        toast({
-          title: "Success!",
-          description: "Your meme has been saved to the gallery.",
-          variant: "default",
-        });
-        
-        // Update last saved state
-        setLastSavedState(JSON.stringify({
-          topText,
-          bottomText,
-          fontSize,
-          textColor,
-          textEffect,
-          imageFilter,
-          backgroundColor
-        }));
-        setHasEdited(false);
+        toast('Your meme has been saved to the gallery.');
       }
     } catch (error) {
-      toast({
-        title: "Error",
-        // @ts-expect-error ignore
-        description: error.response?.data?.error || "Failed to save meme. Please try again.",
-        variant: "destructive",
-      });
+      toast('Failed to save meme. Please try again.');
       console.error('Error during image upload:', error);
     } finally {
       setIsSaving(false);
@@ -251,8 +196,8 @@ export function MemeGenerator({ defaultImage }: MemeGeneratorProps) {
               variants={buttonVariants}
               whileHover={{
                 scale: 1.05,
-                textShadow: "0 0 8px rgb(255,11,122)",
-                boxShadow: "0 0 8px rgb(255,11,122)"
+                textShadow: '0 0 8px rgb(255,11,122)',
+                boxShadow: '0 0 8px rgb(255,11,122)',
               }}
               whileTap={{ scale: 0.95 }}
               onClick={handleSave}
