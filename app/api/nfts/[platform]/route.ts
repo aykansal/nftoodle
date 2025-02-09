@@ -14,7 +14,7 @@ export async function GET(
   try {
     // Convert platform string to enum value
     const platformEnum = platform.toLowerCase() as keyof typeof Platforms;
-    
+
     // Validate platform
     if (!Object.keys(Platforms).includes(platformEnum)) {
       return NextResponse.json(

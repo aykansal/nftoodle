@@ -70,29 +70,29 @@ const uploadToCloudinary = async ({
 };
 
 // Helper function: Add meme to the database
-const addMemeToDatabase = async ({
-  cloudinaryUrl,
-  accountAddress,
-}: {
-  cloudinaryUrl: string;
-  accountAddress: string;
-}) => {
-  // Ensure the user exists before linking
-  const user = await prisma.user.upsert({
-    where: { userWallet: accountAddress },
-    create: { userWallet: accountAddress },
-    update: {}, // Do nothing if user exists
-  });
+// const addMemeToDatabase = async ({
+//   cloudinaryUrl,
+//   accountAddress,
+// }: {
+//   cloudinaryUrl: string;
+//   accountAddress: string;
+// }) => {
+//   // Ensure the user exists before linking
+//   const user = await prisma.user.upsert({
+//     where: { userWallet: accountAddress },
+//     create: { userWallet: accountAddress },
+//     update: {}, // Do nothing if user exists
+//   });
 
-  const meme = await prisma.meme.create({
-    data: {
-      cloudinaryUrl,
-      userAddress: user.userWallet,
-    },
-  });
+//   const meme = await prisma.meme.create({
+//     data: {
+//       cloudinaryUrl,
+//       userAddress: user.userWallet,
+//     },
+//   });
 
-  return meme;
-};
+//   return meme;
+// };
 
 // POST Handler: Upload image and add meme
 export async function POST(req: NextRequest) {
@@ -109,7 +109,7 @@ export async function POST(req: NextRequest) {
 
     // Check rate limit
     const identifier = accountAddress;
-    const { success, limit, reset, remaining } = await ratelimit.limit(identifier);
+    const { success, reset, remaining } = await ratelimit.limit(identifier);
     
     if (!success) {
       return NextResponse.json(

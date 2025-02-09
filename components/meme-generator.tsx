@@ -3,12 +3,12 @@ import { useRef, useState, useEffect } from 'react';
 
 import axios from 'axios';
 import { motion } from 'framer-motion';
-import { ImagePlus, Type, Wand2, Palette } from 'lucide-react';
+import { Type, Wand2, Palette } from 'lucide-react';
 import { useActiveAccount } from 'thirdweb/react';
 import { useToast } from "@/hooks/use-toast";
 
 import type { MemeGeneratorProps } from '@/lib/types';
-import { squidGameVariants, tabVariants } from '@/lib/data';
+import { squidGameVariants } from '@/lib/data';
 
 import { Slider } from '@/components/ui/slider';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -200,9 +200,10 @@ export function MemeGenerator({ defaultImage }: MemeGeneratorProps) {
         }));
         setHasEdited(false);
       }
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "Error",
+        // @ts-expect-error ignore
         description: error.response?.data?.error || "Failed to save meme. Please try again.",
         variant: "destructive",
       });
@@ -487,7 +488,7 @@ export function MemeGenerator({ defaultImage }: MemeGeneratorProps) {
 //     </div>
 //   </div>
 // );
-
+/*
 const TabTrigger = ({ tab, activeTab }: { tab: string; activeTab: string }) => (
   <motion.div
     variants={tabVariants}
@@ -605,3 +606,5 @@ const BackgroundControl = ({
     </div>
   </div>
 );
+
+*/

@@ -10,7 +10,7 @@ export default function Header() {
     { name: 'Gallery', href: '/gallery' },
     { name: 'MyMemes', href: '/my-memes' },
     { name: 'GameZone', href: '/gamezone' },
-    // { name: "Profile", href: "/profile" },
+    // { name: "Profile", href: "/profile" },crom
   ];
 
   return (
