@@ -27,6 +27,7 @@ export default function CreatePage() {
   const [currentPage, setCurrentPage] = useState(1);
 
   const getCachedData = (page: number): string[] | null => {
+    console.log(page)
     const cached = localStorage.getItem(CACHE_KEY);
     if (!cached) return null;
 

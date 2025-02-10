@@ -5,12 +5,10 @@ import Wallet from '@/components/thirdweb/ConnectWallet';
 
 export default function Header() {
   const navItems = [
-    // { name: 'Create', href: '/create' },
     { name: 'Platforms', href: '/platforms' },
     { name: 'Gallery', href: '/gallery' },
     { name: 'MyMemes', href: '/my-memes' },
     { name: 'GameZone', href: '/gamezone' },
-    // { name: "Profile", href: "/profile" },crom
   ];
 
   return (

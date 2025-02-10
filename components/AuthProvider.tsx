@@ -21,6 +21,39 @@ export default function AuthProvider({ children }: AuthProviderProps) {
   const { connect } = useConnect();
   const account = useActiveAccount();
   const [isConnecting, setIsConnecting] = useState(false);
+  const [isInitializing, setIsInitializing] = useState(true);
+
+  // Check for existing connection on mount
+  useEffect(() => {
+    const initializeWallet = async () => {
+      try {
+        // Check if MetaMask is available
+        // @ts-expect-error ignore
+        if (typeof window !== 'undefined' && window.ethereum) {
+          // Check if already connected by attempting to get accounts
+          // @ts-expect-error ignoreb
+          const accounts = await window.ethereum.request({
+            method: 'eth_accounts'
+          });
+
+          if (accounts && accounts.length > 0) {
+            // Reconnect to existing wallet
+            await connect(async () => {
+              const metamask = createWallet('io.metamask');
+              await metamask.connect({ client });
+              return metamask;
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Wallet initialization error:', error);
+      } finally {
+        setIsInitializing(false);
+      }
+    };
+
+    initializeWallet();
+  }, [connect]);
 
   // Handle redirect after successful authentication
   useEffect(() => {
@@ -54,6 +87,15 @@ export default function AuthProvider({ children }: AuthProviderProps) {
       setIsConnecting(false);
     }
   };
+
+  // Show loading state while checking initial connection
+  if (isInitializing) {
+    return (
+      <div className="flex justify-center items-center h-[90vh]">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#FF0B7A]"></div>
+      </div>
+    );
+  }
 
   if (!account) {
     return (
