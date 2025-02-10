@@ -1,12 +1,10 @@
-// pages/api/checkUser.ts
-
 import { prisma } from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
     try {
         const { walletAddress } = await req.json();
-        
+
         if (!walletAddress) {
             return NextResponse.json({ error: 'Wallet address is required' }, { status: 400 });
         }
@@ -18,9 +16,9 @@ export async function POST(req: NextRequest) {
         });
 
         if (existingUser) {
-            return NextResponse.json({ 
-                userExists: true, 
-                user: existingUser 
+            return NextResponse.json({
+                userExists: true,
+                user: existingUser
             });
         }
 
@@ -31,17 +29,17 @@ export async function POST(req: NextRequest) {
             },
         });
 
-        return NextResponse.json({ 
-            userExists: true, 
+        return NextResponse.json({
             user,
-            isNewUser: true 
+            isNewUser: true,
+            userExists: true,
         });
     } catch (error) {
         console.error('Error in profile API:', error);
-        return NextResponse.json({ 
-            error: 'Server error' 
-        }, { 
-            status: 500 
+        return NextResponse.json({
+            error: 'Server error'
+        }, {
+            status: 500
         });
     }
 }

@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { v2 as cloudinary } from 'cloudinary';
 import { prisma } from '@/lib/prisma';
+// import { getServerSession } from 'next-auth';
+import { Ratelimit } from '@upstash/ratelimit';
+import { Redis } from '@upstash/redis';
 
 // Configure Cloudinary
 cloudinary.config({
@@ -8,6 +11,18 @@ cloudinary.config({
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
   secure: true,
+});
+
+// Create Redis client for rate limiting
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL!,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+});
+
+// Create rate limiter
+const ratelimit = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(5, '1 h'), // 5 saves per hour
 });
 
 // Helper function: Upload image to Cloudinary
@@ -55,39 +70,73 @@ const uploadToCloudinary = async ({
 };
 
 // Helper function: Add meme to the database
-const addMemeToDatabase = async ({
-  cloudinaryUrl,
-  accountAddress,
-}: {
-  cloudinaryUrl: string;
-  accountAddress: string;
-}) => {
-  // Ensure the user exists before linking
-  const user = await prisma.user.upsert({
-    where: { userWallet: accountAddress },
-    create: { userWallet: accountAddress },
-    update: {}, // Do nothing if user exists
-  });
+// const addMemeToDatabase = async ({
+//   cloudinaryUrl,
+//   accountAddress,
+// }: {
+//   cloudinaryUrl: string;
+//   accountAddress: string;
+// }) => {
+//   // Ensure the user exists before linking
+//   const user = await prisma.user.upsert({
+//     where: { userWallet: accountAddress },
+//     create: { userWallet: accountAddress },
+//     update: {}, // Do nothing if user exists
+//   });
 
-  const meme = await prisma.meme.create({
-    data: {
-      cloudinaryUrl,
-      userAddress: user.userWallet,
-    },
-  });
+//   const meme = await prisma.meme.create({
+//     data: {
+//       cloudinaryUrl,
+//       userAddress: user.userWallet,
+//     },
+//   });
 
-  return meme;
-};
+//   return meme;
+// };
 
 // POST Handler: Upload image and add meme
+
 export async function POST(req: NextRequest) {
   try {
-    const { imageDataUrl, accountAddress } = await req.json();
+    const { imageDataUrl, userWallet, originalImage } = await req.json();
 
     // Validate inputs
-    if (!imageDataUrl || !accountAddress) {
+    if (!imageDataUrl || !userWallet) {
       return NextResponse.json(
-        { error: 'Invalid input: imageDataUrl or accountAddress missing' },
+        { error: 'Invalid input: imageDataUrl or userWallet missing' },
+        { status: 400 }
+      );
+    }
+
+    // Check rate limit
+    const identifier = userWallet;
+    const { success, reset, remaining } = await ratelimit.limit(identifier);
+
+    if (!success) {
+      return NextResponse.json(
+        {
+          error: `Rate limit exceeded. Try again in ${Math.ceil((reset - Date.now()) / 1000)} seconds.`,
+          remaining,
+          resetIn: reset - Date.now()
+        },
+        { status: 429 }
+      );
+    }
+
+    // Check for duplicate memes from this user with the same original image
+    const existingMeme = await prisma.meme.findFirst({
+      where: {
+        userWallet,
+        originalImage,
+        createdAt: {
+          gte: new Date(Date.now() - 24 * 60 * 60 * 1000) // Within last 24 hours
+        }
+      }
+    });
+
+    if (existingMeme) {
+      return NextResponse.json(
+        { error: 'You have already created a meme from this image recently' },
         { status: 400 }
       );
     }
@@ -95,18 +144,22 @@ export async function POST(req: NextRequest) {
     // Upload to Cloudinary
     const { url: cloudinaryUrl } = await uploadToCloudinary({
       imageDataUrl,
-      accountAddress,
+      accountAddress:userWallet,
     });
-
     // Save meme in the database
-    const meme = await addMemeToDatabase({ cloudinaryUrl, accountAddress });
+    const meme = await prisma.meme.create({
+      data: {
+        cloudinaryUrl,
+        userWallet,
+        originalImage, 
+      },
+    });
 
     return NextResponse.json(meme, { status: 201 });
   } catch (error) {
     console.error('Error in POST handler', error);
     return NextResponse.json(
-      // @ts-expect-error ignore
-      { error: error.message || 'Internal server error' },
+      { error: (error as Error).message || 'Internal server error' },
       { status: 500 }
     );
   }
@@ -131,7 +184,7 @@ export async function GET(req: NextRequest) {
         createdAt: 'desc'
       },
       include: {
-        User: true
+        user: true
       }
     });
 
@@ -139,7 +192,7 @@ export async function GET(req: NextRequest) {
     const transformedMemes = memes.map(meme => ({
       id: meme.id,
       imageUrl: meme.cloudinaryUrl,
-      creator: meme.User?.userWallet.substring(0, 6) + '...' + meme.User?.userWallet.substring(meme.User?.userWallet.length - 6),
+      creator: meme.user?.userWallet.substring(0, 6) + '...' + meme.user?.userWallet.substring(meme.user?.userWallet.length - 6),
       createdAt: meme.createdAt
     }));
 

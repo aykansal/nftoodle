@@ -1,14 +1,16 @@
-"use client";
+'use client';
 
-import axios from "axios";
-import Link from "next/link";
-import Image from "next/image";
-import { MemeData } from "@/lib/types";
-import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
-import { useActiveAccount } from "thirdweb/react";
-import { Triangle, Circle, Square } from "lucide-react";
-import { buttonVariants, cardVariants } from "@/styles/animations";
+import axios from 'axios';
+import Link from 'next/link';
+import Image from 'next/image';
+import { MemeData } from '@/lib/types';
+import { motion } from 'framer-motion';
+import { useState, useEffect } from 'react';
+import { useActiveAccount } from 'thirdweb/react';
+import { Triangle, Circle, Square } from 'lucide-react';
+import { buttonVariants, cardVariants } from '@/styles/animations';
+import XShareButton from '@/components/XShareBtn';
+import MintNft from '@/components/thirdweb/MintNft';
 
 export default function MyMemesPage() {
   const [memes, setMemes] = useState<MemeData[]>([]);
@@ -19,13 +21,14 @@ export default function MyMemesPage() {
   useEffect(() => {
     const fetchMemes = async () => {
       try {
-        const response = await axios.get("/api/profile?address=" + activeUserAddress);
-        if (!response.data) throw new Error("Failed to fetch memes");
+        const response = await axios.get(
+          `/api/profile/${activeUserAddress}`
+        );
+        if (!response.data) throw new Error('Failed to fetch memes');
         const data = await response.data.memes;
-        console.log(data);
         setMemes(data);
       } catch (error) {
-        console.error("Error fetching memes:", error);
+        console.error('Error fetching memes:', error);
       } finally {
         setLoading(false);
       }
@@ -35,17 +38,17 @@ export default function MyMemesPage() {
   }, [activeUserAddress]);
 
   return (
-    <div className="min-h-[90vh] text-white p-8">
+    <div className="p-8 min-h-[90vh] text-white">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="container mx-auto"
+        className="mx-auto container"
       >
         <motion.h1
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
-          className="text-5xl font-bold mb-16 text-center text-[#FF0B7A] font-squid"
+          transition={{ duration: 0.6, ease: 'easeOut' }}
+          className="mb-16 font-bold font-squid text-[#FF0B7A] text-5xl text-center"
         >
           Your Memes
         </motion.h1>
@@ -60,7 +63,7 @@ export default function MyMemesPage() {
               transition={{
                 duration: 2,
                 repeat: Infinity,
-                ease: "linear",
+                ease: 'linear',
               }}
               className="flex justify-center items-center space-x-4"
             >
@@ -82,17 +85,17 @@ export default function MyMemesPage() {
                 },
               },
             }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            className="gap-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
           >
             {memes.length === 0 ? (
               <motion.div
                 variants={cardVariants}
-                className="squid-card col-span-full p-12 text-center"
+                className="col-span-full p-12 text-center squid-card"
               >
-                <h3 className="text-2xl font-bold text-[#FF0B7A] mb-4 font-ibm">
+                <h3 className="mb-4 font-bold font-ibm text-[#FF0B7A] text-2xl">
                   No memes yet!
                 </h3>
-                <p className="text-gray-400 mb-8">
+                <p className="mb-8 text-gray-400">
                   Start creating your own memes or save some from the gallery.
                 </p>
                 <Link href="/platforms">
@@ -100,7 +103,7 @@ export default function MyMemesPage() {
                     variants={buttonVariants}
                     whileHover="hover"
                     whileTap="tap"
-                    className="squid-button px-8 py-3 rounded-lg"
+                    className="px-8 py-3 rounded-lg squid-button"
                   >
                     Create Meme
                   </motion.button>
@@ -112,10 +115,10 @@ export default function MyMemesPage() {
                   key={index}
                   variants={cardVariants}
                   whileHover="hover"
-                  className="squid-card overflow-hidden"
+                  className="overflow-hidden squid-card"
                 >
                   <div className="p-6">
-                    <div className="relative aspect-square rounded-lg overflow-hidden">
+                    <div className="relative rounded-lg overflow-hidden aspect-square">
                       <Image
                         src={meme.cloudinaryUrl}
                         alt={`Meme ${index + 1}`}
@@ -123,19 +126,33 @@ export default function MyMemesPage() {
                         className="object-cover"
                       />
                     </div>
-                    <div className="mt-4 flex justify-between items-center">
-                      <p className="text-gray-400 font-ibm">By {meme.userAddress.substring(0, 6) + '...'}</p>
+                    <div className="flex justify-between items-center mt-4">
+                      {/* <p className="font-ibm text-gray-400">By {meme.userAddress.substring(0, 6) + '...'}</p> */}
                       <motion.button
                         variants={buttonVariants}
                         whileHover="hover"
                         whileTap="tap"
-                        className="squid-button px-4 py-2 rounded-lg text-sm"
+                        className="px-4 py-2 rounded-lg text-sm squid-button"
                       >
-                        Share
+                        Share on
+                        <Image src="/x.svg" alt="X" width={20} height={20} />
                       </motion.button>
+                      <XShareButton imageUrl={meme.cloudinaryUrl} />
+                      <MintNft
+                        name={meme.cloudinaryUrl}
+                        description={meme.cloudinaryUrl}
+                        image={meme.cloudinaryUrl}
+                        minted={false}
+                        memeId={meme.id}
+                        isMinting={false}
+                        isCurrentMinting={false}
+                        onMintStart={() => { }}
+                        onMintComplete={() => { }}
+                      />
                     </div>
                   </div>
                 </motion.div>
+
               ))
             )}
           </motion.div>

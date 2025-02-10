@@ -1,25 +1,104 @@
 'use client';
-import React from 'react';
-import { useActiveAccount, useConnect } from 'thirdweb/react';
-import { AuthorDetails } from './Footer';
-import { motion } from 'framer-motion';
+
+import React, { useEffect, useState } from 'react';
 import { Wallet } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { AuthorDetails } from './Footer';
+import { useActiveAccount, useConnect } from 'thirdweb/react';
 import { createWallet } from 'thirdweb/wallets';
 import { createThirdwebClient } from 'thirdweb';
+import { toast } from 'sonner';
 
 const client = createThirdwebClient({
   clientId: '4f4d7aad88cd12953957137f0f7c0081',
 });
 
-export default function AuthProvider({
-  children,
-}: Readonly<{
+type AuthProviderProps = {
   children: React.ReactNode;
-}>) {
+};
+
+export default function AuthProvider({ children }: AuthProviderProps) {
   const { connect } = useConnect();
   const account = useActiveAccount();
+  const [isConnecting, setIsConnecting] = useState(false);
+  const [isInitializing, setIsInitializing] = useState(false);
 
-  if (!account?.address) {
+  // Check for existing connection on mount
+  useEffect(() => {
+    const initializeWallet = async () => {
+      setIsInitializing(true)
+      try {
+        // Check if MetaMask is available
+        // @ts-expect-error ignore
+        if (typeof window !== 'undefined' && window.ethereum) {
+          // Check if already connected by attempting to get accounts
+          // @ts-expect-error ignoreb
+          const accounts = await window.ethereum.request({
+            method: 'eth_accounts'
+          });
+
+          if (accounts && accounts.length > 0) {
+            // Reconnect to existing wallet
+            await connect(async () => {
+              const metamask = createWallet('io.metamask');
+              await metamask.connect({ client });
+              return metamask;
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Wallet initialization error:', error);
+      } finally {
+        setIsInitializing(false);
+      }
+    };
+
+    initializeWallet();
+  }, [connect]);
+
+  // Handle redirect after successful authentication
+  useEffect(() => {
+    if (account) {
+      toast.success('Wallet connected successfully!');
+    }
+  }, [account]);
+
+  const handleConnect = async () => {
+    try {
+      setIsConnecting(true);
+      toast.loading('Connecting wallet...', {
+        id: 'wallet-connection'
+      });
+
+      await connect(async () => {
+        const metamask = createWallet('io.metamask');
+        await metamask.connect({ client });
+        return metamask;
+      });
+
+      toast.success('Wallet connected successfully!', {
+        id: 'wallet-connection'
+      });
+    } catch (error) {
+      console.error('Wallet connection error:', error);
+      toast.error('Failed to connect wallet. Please try again.', {
+        id: 'wallet-connection'
+      });
+    } finally {
+      setIsConnecting(false);
+    }
+  };
+
+  // Show loading state while checking initial connection
+  if (isInitializing) {
+    return (
+      <div className="flex justify-center items-center h-[90vh]">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#FF0B7A]"></div>
+      </div>
+    );
+  }
+
+  if (!account) {
     return (
       <motion.div
         variants={containerVariants}
@@ -27,10 +106,7 @@ export default function AuthProvider({
         animate="visible"
         className="flex flex-col justify-center items-center h-[90vh] text-neutral-300"
       >
-        <motion.div
-          variants={itemVariants}
-          className="relative w-24 h-24 mb-6"
-        >
+        <motion.div variants={itemVariants} className="relative w-24 h-24 mb-6">
           <motion.div
             animate={{
               scale: [1, 1.2, 1],
@@ -39,7 +115,7 @@ export default function AuthProvider({
             transition={{
               duration: 2,
               repeat: Infinity,
-              ease: "easeInOut"
+              ease: 'easeInOut',
             }}
             className="absolute inset-0 rounded-full bg-[#FF0B7A]/20 blur-xl"
           />
@@ -61,39 +137,20 @@ export default function AuthProvider({
             className="flex flex-col gap-4 mt-6"
           >
             <motion.button
-              // whileHover={{
-              //   scale: 1.05,
-              //   boxShadow: "0 0 15px rgba(255, 11, 122, 0.5)"
-              // }}
               whileTap={{ scale: 0.95 }}
-              className="px-8 py-3 bg-gradient-to-r from-[#FF0B7A] to-[#FF0B7A]/80 rounded-lg font-semibold text-white transition-all"
-              onClick={() => {
-                connect(async () => {
-                  const metamask = createWallet("io.metamask"); 
-                  await metamask.connect({ client });
-                  return metamask;
-                })
-              }}
+              className="px-8 py-3 bg-gradient-to-r from-[#FF0B7A] to-[#FF0B7A]/80 rounded-lg font-semibold text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={handleConnect}
+              disabled={isConnecting}
             >
-              Connect Metamask Wallet
+              {isConnecting ? 'Connecting...' : 'Connect Metamask Wallet'}
             </motion.button>
-            <p className="text-sm text-neutral-500">
-              New to Web3? {' '}
-              <a
-                href="https://ethereum.org/en/wallets/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[#FF0B7A] hover:underline"
-              >
-                Learn about wallets
-              </a>
-            </p>
           </motion.div>
         </motion.div>
         <AuthorDetails className="absolute bottom-6" />
       </motion.div>
     );
   }
+
   return <>{children}</>;
 }
 
@@ -104,9 +161,9 @@ const containerVariants = {
     y: 0,
     transition: {
       duration: 0.5,
-      staggerChildren: 0.2
-    }
-  }
+      staggerChildren: 0.2,
+    },
+  },
 };
 
 const itemVariants = {
@@ -114,6 +171,5 @@ const itemVariants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.5 }
-  }
+  },
 };
