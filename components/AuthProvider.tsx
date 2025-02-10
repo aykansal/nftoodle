@@ -1,102 +1,25 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Wallet } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { AuthorDetails } from './Footer';
-import { useActiveAccount, useConnect } from 'thirdweb/react';
-import { createWallet } from 'thirdweb/wallets';
-import { createThirdwebClient } from 'thirdweb';
+import { useActiveAccount } from 'thirdweb/react';
 import { toast } from 'sonner';
-
-const client = createThirdwebClient({
-  clientId: '4f4d7aad88cd12953957137f0f7c0081',
-});
+import ConnectWallet from './thirdweb/ConnectWallet';
 
 type AuthProviderProps = {
   children: React.ReactNode;
 };
 
 export default function AuthProvider({ children }: AuthProviderProps) {
-  const { connect } = useConnect();
   const account = useActiveAccount();
-  const [isConnecting, setIsConnecting] = useState(false);
-  const [isInitializing, setIsInitializing] = useState(false);
 
-  // Check for existing connection on mount
-  useEffect(() => {
-    const initializeWallet = async () => {
-      setIsInitializing(true)
-      try {
-        // Check if MetaMask is available
-        // @ts-expect-error ignore
-        if (typeof window !== 'undefined' && window.ethereum) {
-          // Check if already connected by attempting to get accounts
-          // @ts-expect-error ignoreb
-          const accounts = await window.ethereum.request({
-            method: 'eth_accounts'
-          });
-
-          if (accounts && accounts.length > 0) {
-            // Reconnect to existing wallet
-            await connect(async () => {
-              const metamask = createWallet('io.metamask');
-              await metamask.connect({ client });
-              return metamask;
-            });
-          }
-        }
-      } catch (error) {
-        console.error('Wallet initialization error:', error);
-      } finally {
-        setIsInitializing(false);
-      }
-    };
-
-    initializeWallet();
-  }, [connect]);
-
-  // Handle redirect after successful authentication
   useEffect(() => {
     if (account) {
       toast.success('Wallet connected successfully!');
     }
   }, [account]);
-
-  const handleConnect = async () => {
-    try {
-      setIsConnecting(true);
-      toast.loading('Connecting wallet...', {
-        id: 'wallet-connection'
-      });
-
-      await connect(async () => {
-        const metamask = createWallet('io.metamask');
-        await metamask.connect({ client });
-        return metamask;
-      });
-
-      toast.success('Wallet connected successfully!', {
-        id: 'wallet-connection'
-      });
-    } catch (error) {
-      console.error('Wallet connection error:', error);
-      toast.error('Failed to connect wallet. Please try again.', {
-        id: 'wallet-connection'
-      });
-    } finally {
-      setIsConnecting(false);
-    }
-  };
-
-  // Show loading state while checking initial connection
-  if (isInitializing) {
-    return (
-      <div className="flex justify-center items-center h-[90vh]">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#FF0B7A]"></div>
-      </div>
-    );
-  }
 
   if (!account) {
     return (
@@ -136,14 +59,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
             variants={itemVariants}
             className="flex flex-col gap-4 mt-6"
           >
-            <motion.button
-              whileTap={{ scale: 0.95 }}
-              className="px-8 py-3 bg-gradient-to-r from-[#FF0B7A] to-[#FF0B7A]/80 rounded-lg font-semibold text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-              onClick={handleConnect}
-              disabled={isConnecting}
-            >
-              {isConnecting ? 'Connecting...' : 'Connect Metamask Wallet'}
-            </motion.button>
+            <ConnectWallet />
           </motion.div>
         </motion.div>
         <AuthorDetails className="absolute bottom-6" />

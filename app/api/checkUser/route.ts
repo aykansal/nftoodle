@@ -3,29 +3,30 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
     try {
-        const { walletAddress } = await req.json();
+        const { userWallet } = await req.json();
 
-        if (!walletAddress) {
+        if (!userWallet) {
             return NextResponse.json({ error: 'Wallet address is required' }, { status: 400 });
         }
 
         const existingUser = await prisma.user.findUnique({
             where: {
-                userWallet: walletAddress,
+                userWallet
             },
         });
 
         if (existingUser) {
             return NextResponse.json({
+                user: existingUser,
+                isNewUser: false,
                 userExists: true,
-                user: existingUser
             });
         }
 
         // Create new user if doesn't exist
         const user = await prisma.user.create({
             data: {
-                userWallet: walletAddress,
+                userWallet
             },
         });
 

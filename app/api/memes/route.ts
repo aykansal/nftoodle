@@ -144,14 +144,14 @@ export async function POST(req: NextRequest) {
     // Upload to Cloudinary
     const { url: cloudinaryUrl } = await uploadToCloudinary({
       imageDataUrl,
-      accountAddress:userWallet,
+      accountAddress: userWallet,
     });
     // Save meme in the database
     const meme = await prisma.meme.create({
       data: {
         cloudinaryUrl,
         userWallet,
-        originalImage, 
+        originalImage,
       },
     });
 
