@@ -10,7 +10,6 @@ import {
   createThirdwebClient,
   getContract,
 } from 'thirdweb';
-import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
 import {
   Tooltip,
@@ -18,32 +17,38 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import axios from 'axios';
+import { motion } from 'framer-motion';
+import { buttonVariants } from '@/styles/animations';
 
 const CONTRACT_ADDRESS = '0xaC434dc0061aD90B45415e92b160D7Bbaa21F5db';
 const CHAIN_ID = 656476;
 const CLIENT_ID = 'aa99b0e9769d2262d120e7aec4ec7a94';
 
+interface MintNftData {
+  name: string;
+  description: string;
+  image: string;
+  minted: boolean;
+  memeId: number;
+  isMinting: boolean;
+  isCurrentMinting: boolean;
+  onMintStart: () => void;
+  onMintComplete: (txStatus: boolean) => void;
+}
+
 export default function MintNft({
-  // @ts-expect-error ignore
   name,
-  // @ts-expect-error ignore
   description,
-  // @ts-expect-error ignore
   image,
-  // @ts-expect-error ignore
   minted,
-  // @ts-expect-error ignore
   memeId,
-  // @ts-expect-error ignore
   isMinting,
-  // @ts-expect-error ignore
   isCurrentMinting,
-  // @ts-expect-error ignore
   onMintStart,
-  // @ts-expect-error ignore
   onMintComplete,
-}) {
-  const [error, setError] = useState(null);
+}: MintNftData) {
+  const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -65,7 +70,6 @@ export default function MintNft({
         setIsLoading(false);
       };
       img.onerror = () => {
-        // @ts-expect-error ignore
         setError('Failed to load NFT image');
         setIsLoading(false);
       };
@@ -76,7 +80,6 @@ export default function MintNft({
 
   useEffect(() => {
     if (!name || !description || !image) {
-      // @ts-expect-error ignore
       setError('Missing required NFT metadata');
     }
   }, [name, description, image]);
@@ -89,7 +92,6 @@ export default function MintNft({
       error?.code === -32000 &&
       error?.message?.includes('Insufficient funds')
     ) {
-      // @ts-expect-error ignore
       setError('Insufficient funds to complete transaction');
       onMintComplete(false);
       return;
@@ -139,19 +141,13 @@ export default function MintNft({
       console.log('Mint successful:', mintResponse);
 
       // Update database for this specific meme
-      const response = await fetch('/api/profile', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          address: wallet,
-          memeId: memeId,
-          hasMinted: true,
-        }),
+      const response = await axios.put('/api/memes', {
+        userWallet: wallet,
+        memeId,
+        txnHash: mintResponse.transactionHash,
       });
 
-      if (!response.ok) {
+      if (!response.data) {
         throw new Error('Failed to update mint status in DB');
       }
 
@@ -187,13 +183,13 @@ export default function MintNft({
   return (
     <div className="space-y-4">
       {error && (
-        <Alert variant="destructive">
+        <Alert variant="destructive" className="bg-red-900/20 border-red-900 text-red-400">
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
 
       {success && (
-        <Alert>
+        <Alert className="bg-green-900/20 border-green-900 text-green-400">
           <AlertDescription>
             NFT successfully minted! Check your wallet.
           </AlertDescription>
@@ -206,19 +202,37 @@ export default function MintNft({
           <TooltipProvider delayDuration={0}>
             <Tooltip open={success && showTooltip}>
               <TooltipTrigger asChild>
-                <div className="w-full font-ibm">
+                <div className="w-full font-squid">
                   {minted ? (
-                    <Button className="bg-green-700 hover:bg-green/90 py-3 rounded-full w-full font-bold text-white transform transition-all duration-300 ease-in-out hover:scale-105">
+                    <motion.button
+                      variants={buttonVariants}
+                      whileHover="hover"
+                      whileTap="tap"
+                      className="w-full px-4 py-2 rounded-lg font-bold text-white bg-green-600/20 border-2 border-green-500 backdrop-blur-sm transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                      disabled
+                    >
                       Already Minted
-                    </Button>
+                    </motion.button>
                   ) : (
-                    <Button
-                      className="bg-[#FF0B7A] hover:bg-[#FF0B7A]/90 py-3 rounded-full w-full font-bold text-white transform transition-all duration-300 ease-in-out hover:scale-105"
+                    <motion.button
+                      variants={buttonVariants}
+                      whileHover="hover"
+                      whileTap="tap"
+                      className={`w-full px-4 py-2 rounded-lg font-bold text-white squid-button transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed ${
+                        isCurrentMinting ? 'animate-pulse' : ''
+                      }`}
                       disabled={isButtonDisabled}
                       onClick={mint}
                     >
-                      {isCurrentMinting ? 'Minting...' : 'Mint'}
-                    </Button>
+                      {isCurrentMinting ? (
+                        <span className="flex items-center justify-center gap-2">
+                          <span className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                          Minting...
+                        </span>
+                      ) : (
+                        'Mint NFT'
+                      )}
+                    </motion.button>
                   )}
                 </div>
               </TooltipTrigger>

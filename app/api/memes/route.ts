@@ -213,3 +213,20 @@ export async function GET(req: NextRequest) {
     );
   }
 }
+
+export async function PUT(req: NextRequest) {
+  const { userWallet, memeId, txnHash } = await req.json();
+
+  const updatedMeme = await prisma.meme.update({
+    where: {
+      id: memeId,
+      userWallet: userWallet
+    },
+    data: {
+      minted: true,
+      txnhash: txnHash
+    }
+  });
+
+  return NextResponse.json(updatedMeme);
+}

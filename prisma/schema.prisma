@@ -13,9 +13,10 @@ model meme {
   cloudinaryUrl String   @unique
   originalImage String
   createdAt     DateTime @default(now())
-  minted        Boolean? @default(false)
   user          user     @relation(fields: [userWallet], references: [userWallet])
   userWallet    String
+  minted        Boolean? @default(false)
+  txnhash       String?  @unique
 }
 
 model user {

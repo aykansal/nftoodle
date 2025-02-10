@@ -21,9 +21,7 @@ export default function MyMemesPage() {
   useEffect(() => {
     const fetchMemes = async () => {
       try {
-        const response = await axios.get(
-          `/api/profile/${activeUserAddress}`
-        );
+        const response = await axios.get(`/api/profile/${activeUserAddress}`);
         if (!response.data) throw new Error('Failed to fetch memes');
         const data = await response.data.memes;
         setMemes(data);
@@ -127,32 +125,21 @@ export default function MyMemesPage() {
                       />
                     </div>
                     <div className="flex justify-between items-center mt-4">
-                      {/* <p className="font-ibm text-gray-400">By {meme.userAddress.substring(0, 6) + '...'}</p> */}
-                      <motion.button
-                        variants={buttonVariants}
-                        whileHover="hover"
-                        whileTap="tap"
-                        className="px-4 py-2 rounded-lg text-sm squid-button"
-                      >
-                        Share on
-                        <Image src="/x.svg" alt="X" width={20} height={20} />
-                      </motion.button>
                       <XShareButton imageUrl={meme.cloudinaryUrl} />
                       <MintNft
                         name={meme.cloudinaryUrl}
                         description={meme.cloudinaryUrl}
                         image={meme.cloudinaryUrl}
-                        minted={false}
+                        minted={meme.minted}
                         memeId={meme.id}
                         isMinting={false}
                         isCurrentMinting={false}
-                        onMintStart={() => { }}
-                        onMintComplete={() => { }}
+                        onMintStart={() => {}}
+                        onMintComplete={() => {}}
                       />
                     </div>
                   </div>
                 </motion.div>
-
               ))
             )}
           </motion.div>
