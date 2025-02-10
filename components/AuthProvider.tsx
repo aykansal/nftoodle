@@ -21,11 +21,12 @@ export default function AuthProvider({ children }: AuthProviderProps) {
   const { connect } = useConnect();
   const account = useActiveAccount();
   const [isConnecting, setIsConnecting] = useState(false);
-  const [isInitializing, setIsInitializing] = useState(true);
+  const [isInitializing, setIsInitializing] = useState(false);
 
   // Check for existing connection on mount
   useEffect(() => {
     const initializeWallet = async () => {
+      setIsInitializing(true)
       try {
         // Check if MetaMask is available
         // @ts-expect-error ignore

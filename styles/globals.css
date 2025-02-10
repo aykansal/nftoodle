@@ -74,9 +74,9 @@
   }
 
   .squid-input {
-    @apply bg-black/50 border-2 border-[#FF0B7A]/30
+    @apply bg-gray-800/50 border-2 border-[#FF0B7A]/30
+           rounded-lg px-4 py-2 text-white
            focus:border-[#FF0B7A] focus:ring-[#FF0B7A]/20
-           text-white placeholder-gray-400
            transition-all duration-300;
   }
 
@@ -86,6 +86,156 @@
 
   .pulse-effect {
     animation: pulse 2s infinite;
+  }
+
+  .squid-filter-redLight {
+    @apply brightness-125 saturate-150 hue-rotate-[340deg];
+  }
+
+  .squid-filter-greenLight {
+    @apply brightness-110 saturate-100 hue-rotate-[120deg];
+  }
+
+  .squid-filter-arena {
+    @apply contrast-125 brightness-90;
+  }
+
+  .squid-filter-doll {
+    @apply sepia brightness-90 hue-rotate-[300deg];
+  }
+
+  .squid-filter-glass {
+    @apply opacity-80 backdrop-blur-[0.5px];
+  }
+
+  .squid-tab {
+    @apply relative flex flex-col items-center justify-center p-3 
+           rounded-lg transition-all duration-300
+           hover:bg-[#FF0B7A]/20
+           data-[state=active]:bg-[#FF0B7A]
+           data-[state=active]:text-white;
+  }
+
+  .squid-tab-wrapper {
+    /* @apply group; */
+  }
+
+  .squid-slider {
+    @apply w-full h-2 rounded-lg appearance-none
+           bg-gray-800/50 
+           [&::-webkit-slider-thumb]:appearance-none
+           [&::-webkit-slider-thumb]:w-4
+           [&::-webkit-slider-thumb]:h-4
+           [&::-webkit-slider-thumb]:rounded-full
+           [&::-webkit-slider-thumb]:bg-[#FF0B7A]
+           [&::-webkit-slider-thumb]:cursor-pointer;
+  }
+
+  .squid-color-picker {
+    @apply w-12 h-12 rounded-lg cursor-pointer
+           border-2 border-[#FF0B7A]/30
+           hover:border-[#FF0B7A]
+           transition-all duration-300;
+  }
+
+  .squid-checkbox {
+    @apply w-5 h-5 rounded-md
+           accent-[#FF0B7A]
+           transition-all duration-300;
+  }
+
+  .squid-button-small {
+    @apply p-2 rounded-lg bg-[#FF0B7A]/20 
+           hover:bg-[#FF0B7A]/30 
+           disabled:opacity-50 disabled:cursor-not-allowed
+           transition-all duration-300;
+  }
+
+  .squid-filter-neon {
+    @apply brightness-110 contrast-125 
+           [filter:drop-shadow(0_0_8px_rgba(255,11,122,0.5))];
+  }
+
+  .squid-filter-glitch {
+    @apply contrast-150 brightness-110
+           [filter:url(#glitch-filter)];
+  }
+
+  .meme-canvas-container {
+    @apply relative;
+  }
+
+  .meme-canvas-container::after {
+    content: '';
+    @apply absolute inset-0 pointer-events-none
+           opacity-0 transition-opacity duration-300;
+  }
+
+  .meme-canvas-container:hover::after {
+    @apply opacity-100;
+  }
+
+  @keyframes textGlow {
+    0%, 100% { text-shadow: 0 0 10px rgba(255,11,122,0.5); }
+    50% { text-shadow: 0 0 20px rgba(255,11,122,0.8); }
+  }
+
+  @keyframes textShake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(2px); }
+    75% { transform: translateX(-2px); }
+  }
+
+  .text-animation-glow {
+    animation: textGlow 2s infinite;
+  }
+
+  .text-animation-shake {
+    animation: textShake 0.5s infinite;
+  }
+
+  .squid-button-icon {
+    @apply p-2 rounded-lg bg-[#FF0B7A]/20 
+           hover:bg-[#FF0B7A]/30 
+           disabled:opacity-50 disabled:cursor-not-allowed
+           transition-all duration-300
+           relative;
+  }
+
+  .squid-tooltip {
+    @apply absolute -bottom-8 left-1/2 -translate-x-1/2
+           px-2 py-1 rounded bg-[#FF0B7A]
+           text-xs text-white whitespace-nowrap
+           opacity-0 scale-95 pointer-events-none
+           transition-all duration-200
+           group-hover:opacity-100 group-hover:scale-100;
+  }
+
+  .squid-button-outline {
+    @apply relative overflow-hidden transition-all duration-300 
+           border-2 border-[#FF0B7A] bg-transparent
+           hover:bg-[#FF0B7A]/10
+           text-white font-squid tracking-wider
+           shadow-[0_0_10px_rgba(255,11,122,0.3)]
+           hover:shadow-[0_0_20px_rgba(255,11,122,0.5)]
+           active:scale-95
+           flex items-center justify-center;
+  }
+
+  .squid-control-group {
+    @apply space-y-2 p-4 rounded-lg bg-gray-900/30
+           border border-[#FF0B7A]/20
+           hover:border-[#FF0B7A]/40
+           transition-all duration-300;
+  }
+
+  .squid-input-label {
+    @apply text-sm font-medium text-gray-300
+           flex items-center gap-2;
+  }
+
+  .squid-button.active-emoji {
+    @apply ring-2 ring-[#FF0B7A] scale-105;
   }
 }
 
