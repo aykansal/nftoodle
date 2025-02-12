@@ -1,4 +1,29 @@
-export interface nft {
+// User Interface (Based on the Prisma model)
+export interface User {
+  id: number;
+  userWallet: string;
+  memes: Meme[];  // Related memes for the user
+  createdAt: Date;
+}
+
+export interface tokenList {
+  image_url: string;
+}
+
+// Meme Interface (Based on the Prisma model)
+export interface Meme {
+  id: number;
+  cloudinaryUrl: string;
+  originalImage: string;
+  createdAt: Date;
+  user: User; // User associated with this meme
+  userWallet: string;
+  minted: boolean; // Optional field for minted status
+  txnhash?: string; // Optional field for transaction hash
+}
+
+// NFT Interface
+export interface Nft {
   blockchain: string;
   chain_id: number;
   contract_address: string;
@@ -7,22 +32,7 @@ export interface nft {
   marketplaces: string;
 }
 
-export interface MemeData {
-  cloudinaryUrl: string;
-  createdAt: string; // ISO 8601 format string
-  id: number;
-  minted: boolean;
-  userAddress: string; // Ethereum address in string format
-}
-
-export interface tokenList {
-  image_url: string;
-}
-
-export interface MemeGeneratorProps {
-  defaultImage: string;
-}
-
+// Updated Cloudinary Upload Response Interface (from the schema)
 export interface CloudinaryUploadResponse {
   asset_id: string;
   public_id: string;
@@ -45,7 +55,28 @@ export interface CloudinaryUploadResponse {
   secure_url: string;
 }
 
-// opensea nft collectons types
+export interface CloudinaryResponse {
+  secure_url: string;
+  public_id: string;
+  version: number;
+  width: number;
+  height: number;
+  format: string;
+  created_at: string;
+  resource_type: string;
+  tags: string[];
+  bytes: number;
+  type: string;
+  url: string;
+}
+
+
+// Updated Meme Generator Interface
+export interface MemeGeneratorProps {
+  defaultImage: string;
+}
+
+// OpenSea NFT Collection Types
 export interface Media {
   gateway: string;
   thumbnail: string;
@@ -118,17 +149,17 @@ export interface NFTItem {
   contractMetadata: ContractMetadata;
 }
 
-export interface CloudinaryResponse {
-  secure_url: string;
-  public_id: string;
-  version: number;
-  width: number;
-  height: number;
-  format: string;
-  created_at: string;
-  resource_type: string;
-  tags: string[];
-  bytes: number;
-  type: string;
-  url: string;
+// Game Card Interface (For matching game)
+export interface GameCard {
+  id: number;
+  cloudinaryUrl: string;
+  isFlipped: boolean;
+  isMatched: boolean;
+}
+
+// Platform Enum (Reflecting the Prisma Enum)
+export enum Platforms {
+  bazar = "bazar",
+  opensea = "opensea",
+  unleash = "unleash",
 }

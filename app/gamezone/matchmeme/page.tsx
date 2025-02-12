@@ -1,26 +1,20 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { default as Img } from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
-import type { CloudinaryUploadResponse } from '@/lib/types';
+import type { GameCard, Meme } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import Loader from '@/components/loader';
 import { useRouter } from 'next/navigation';
 import { Home, RefreshCcw } from 'lucide-react';
 import { Modal } from '@/components/ui/modal';
-
-type GameCard = {
-  id: number;
-  imageUrl: string;
-  isFlipped: boolean;
-  isMatched: boolean;
-};
+import { toast } from 'sonner';
+import Image from 'next/image';
 
 export default function Matchmeme() {
   const router = useRouter();
-  const [memes, setMemes] = useState<CloudinaryUploadResponse[]>([]);
+  const [memes, setMemes] = useState<Meme[]>([]);
   const [cards, setCards] = useState<GameCard[]>([]);
   const [flippedCards, setFlippedCards] = useState<number[]>([]);
   const [matchedPairs, setMatchedPairs] = useState<number>(0);
@@ -29,10 +23,6 @@ export default function Matchmeme() {
   const [loading, setLoading] = useState<boolean>(true);
   const [score, setScore] = useState<number>(0);
   const [bestScore, setBestScore] = useState<number>(0);
-  const [imagesLoaded, setImagesLoaded] = useState<boolean>(false);
-  const [, setPreloadedImages] = useState<{
-    [key: string]: HTMLImageElement;
-  }>({});
   const [showEndGameModal, setShowEndGameModal] = useState(false);
   const [showGameSummaryModal, setShowGameSummaryModal] = useState(false);
 
@@ -40,12 +30,20 @@ export default function Matchmeme() {
   useEffect(() => {
     const fetchMemes = async () => {
       try {
-        const response = await axios.get('/api/memes');
-        setMemes(response.data);
-        // Start preloading images as soon as we get the meme data
-        preloadImages(response.data);
+        setLoading(true);
+        const memes = await axios
+          .get('/api/memes?page=1&limit=13')
+          .then((res) => res?.data?.memes);
+
+        if (!memes.length) {
+          toast.error('No Memes Found! Create Some then try again')
+          throw new Error('No memes found');
+        }
+        console.log(memes)
+        setMemes(memes);
       } catch (error) {
         console.error('Error fetching memes:', error);
+        toast.error('Failed to load memes. Please try again.');
       } finally {
         setLoading(false);
       }
@@ -54,36 +52,17 @@ export default function Matchmeme() {
     fetchMemes();
   }, []);
 
-  // Preload images
-  const preloadImages = (memesData: CloudinaryUploadResponse[]) => {
-    const imagePromises: Promise<void>[] = [];
-    const tempPreloadedImages: { [key: string]: HTMLImageElement } = {};
-
-    memesData.forEach((meme) => {
-      const promise = new Promise<void>((resolve) => {
-        const img = new Image();
-        img.src = meme.url;
-        img.onload = () => {
-          tempPreloadedImages[meme.url] = img;
-          resolve();
-        };
-        img.onerror = () => {
-          console.error(`Failed to load image: ${meme.url}`);
-          resolve();
-        };
-      });
-      imagePromises.push(promise);
-    });
-
-    Promise.all(imagePromises).then(() => {
-      setPreloadedImages(tempPreloadedImages);
-      setImagesLoaded(true);
-    });
-  };
-
   // Initialize game
   const initializeGame = () => {
-    if (memes.length < 6 || !imagesLoaded) return; // Ensure we have enough memes and images are loaded
+    if (memes.length < 6) {
+      toast.error(
+        'Not enough memes to start the game. At least 6 memes are required.'
+      );
+      console.error(
+        'Not enough memes to start the game. At least 6 memes are required.'
+      );
+      return;
+    }
 
     // Select 6 random memes
     const shuffledMemes = [...memes]
@@ -94,7 +73,7 @@ export default function Matchmeme() {
     const gameCards: GameCard[] = [...shuffledMemes, ...shuffledMemes]
       .map((meme, index) => ({
         id: index,
-        imageUrl: meme.url,
+        cloudinaryUrl: meme.cloudinaryUrl, // Use the secure cloudinary URL
         isFlipped: false,
         isMatched: false,
       }))
@@ -109,38 +88,57 @@ export default function Matchmeme() {
   };
 
   // Handle card click
-  const handleCardClick = (cardId: number) => {
+  const handleCardClick = (cardId: number, e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent default navigation
+
     if (
+      !gameStarted ||
       flippedCards.length === 2 || // Don't allow more than 2 cards flipped
       flippedCards.includes(cardId) || // Don't allow same card to be flipped
       cards[cardId].isMatched // Don't allow matched cards to be flipped
-    )
+    ) {
       return;
+    }
 
     const newFlippedCards = [...flippedCards, cardId];
     setFlippedCards(newFlippedCards);
+
+    // Update cards state to show the flipped card
+    setCards((prev) =>
+      prev.map((card, idx) =>
+        idx === cardId ? { ...card, isFlipped: true } : card
+      )
+    );
 
     if (newFlippedCards.length === 2) {
       setMoves((prev) => prev + 1);
       const [firstCard, secondCard] = newFlippedCards;
 
-      if (cards[firstCard].imageUrl === cards[secondCard].imageUrl) {
+      if (cards[firstCard].cloudinaryUrl === cards[secondCard].cloudinaryUrl) {
         // Match found
-        setCards((prev) =>
-          prev.map((card, idx) =>
-            idx === firstCard || idx === secondCard
-              ? { ...card, isMatched: true }
-              : card
-          )
-        );
-        setMatchedPairs((prev) => prev + 1);
-        setScore((prev) => prev + 100);
-        setFlippedCards([]);
-      } else {
-        // No match
         setTimeout(() => {
+          setCards((prev) =>
+            prev.map((card, idx) =>
+              idx === firstCard || idx === secondCard
+                ? { ...card, isMatched: true, isFlipped: true }
+                : card
+            )
+          );
+          setMatchedPairs((prev) => prev + 1);
+          setScore((prev) => prev + 100); // Add 100 points for each match
           setFlippedCards([]);
-          setScore((prev) => Math.max(0, prev - 10));
+        }, 500);
+      } else {
+        // No match - just flip the cards back
+        setTimeout(() => {
+          setCards((prev) =>
+            prev.map((card, idx) =>
+              idx === firstCard || idx === secondCard
+                ? { ...card, isFlipped: false }
+                : card
+            )
+          );
+          setFlippedCards([]);
         }, 1000);
       }
     }
@@ -148,29 +146,23 @@ export default function Matchmeme() {
 
   // Check for game completion
   useEffect(() => {
-    if (matchedPairs === 6) {
-      const finalScore = Math.max(0, score - moves * 5);
-      if (finalScore > bestScore) {
-        setBestScore(finalScore);
-        localStorage.setItem('memeGameBestScore', finalScore.toString());
+    if (gameStarted && matchedPairs === 6) {
+      if (score > bestScore) {
+        setBestScore(score);
+        localStorage.setItem('memeGameBestScore', score.toString());
       }
-    }
-  }, [matchedPairs, score, moves, bestScore]);
 
-  // Load best score from localStorage
-  useEffect(() => {
-    const savedBestScore = localStorage.getItem('memeGameBestScore');
-    if (savedBestScore) {
-      setBestScore(parseInt(savedBestScore));
+      setTimeout(() => {
+        setShowGameSummaryModal(true);
+      }, 1000);
     }
-  }, []);
+  }, [matchedPairs, score, bestScore, gameStarted]);
 
-  // Update handleEndGame to show modal instead of alert
+  // Handle end game confirmation
   const handleEndGame = () => {
     setShowEndGameModal(true);
   };
 
-  // Handle end game confirmation
   const handleEndGameConfirm = () => {
     setShowEndGameModal(false);
     setShowGameSummaryModal(true);
@@ -184,7 +176,7 @@ export default function Matchmeme() {
 
   // Handle return to home
   const handleReturnHome = () => {
-    router.push('/');
+    router.push('/gamezone');
   };
 
   if (loading) {
@@ -203,7 +195,7 @@ export default function Matchmeme() {
             NFToodle Memory Game
           </h1>
           <p className="text-lg text-green-400 mb-4">
-            Match the meme pairs to win! Less moves = Higher score
+            Match the meme pairs to win! Each match is worth 100 points
           </p>
           <div className="flex justify-center gap-4 mb-4">
             <div className="text-[#FF0B7A]">Moves: {moves}</div>
@@ -214,13 +206,8 @@ export default function Matchmeme() {
             <Button
               onClick={initializeGame}
               className="bg-[#FF0B7A] hover:bg-[#FF0B7A]/80 text-white px-6 py-2 rounded-full"
-              disabled={!imagesLoaded}
             >
-              {!imagesLoaded
-                ? 'Loading Images...'
-                : gameStarted
-                  ? 'Restart Game'
-                  : 'Start Game'}
+              {gameStarted ? 'Restart Game' : 'Start Game'}
             </Button>
             {gameStarted && (
               <Button
@@ -250,32 +237,42 @@ export default function Matchmeme() {
                     className={`w-full h-full bg-[#1A1A1A] cursor-pointer transition-all duration-500 ${
                       card.isMatched ? 'opacity-60' : ''
                     }`}
-                    onClick={() => handleCardClick(card.id)}
+                    onClick={(e) => handleCardClick(card.id, e)}
                   >
                     <CardContent className="p-0 w-full h-full relative">
                       <div
                         className={`w-full h-full transition-all duration-500 transform ${
-                          flippedCards.includes(card.id) || card.isMatched
+                          card.isFlipped || card.isMatched
                             ? 'rotate-y-0'
                             : 'rotate-y-180'
                         }`}
                       >
-                        {flippedCards.includes(card.id) || card.isMatched ? (
-                          <div className="w-full h-full">
-                            <Img
-                              src={card.imageUrl}
-                              alt="Meme"
-                              width={200}
-                              height={200}
-                              className="w-full h-full object-cover rounded-lg"
-                              priority
-                            />
-                          </div>
-                        ) : (
-                          <div className="w-full h-full bg-[#1A1A1A] rounded-lg border-2 border-[#FF0B7A] flex items-center justify-center">
-                            <span className="text-4xl text-[#FF0B7A]">?</span>
-                          </div>
-                        )}
+                        <div className="w-full h-full">
+                          {card.isFlipped || card.isMatched ? (
+                            <div className="relative w-full h-full">
+                              <Image
+                                src={card.cloudinaryUrl}
+                                alt="Meme Card"
+                                fill
+                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                className="object-cover rounded-lg"
+                                priority={true}
+                                onError={(e) => {
+                                  console.error(
+                                    `Failed to load image: ${card.cloudinaryUrl}`
+                                  );
+                                  const target = e.target as HTMLImageElement;
+                                  target.onerror = null;
+                                  target.src = '/images/logo.jpg';
+                                }}
+                              />
+                            </div>
+                          ) : (
+                            <div className="w-full h-full bg-[#1A1A1A] rounded-lg border-2 border-[#FF0B7A] flex items-center justify-center">
+                              <span className="text-4xl text-[#FF0B7A]">?</span>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
@@ -295,8 +292,7 @@ export default function Matchmeme() {
               🎉 Congratulations! 🎉
             </h2>
             <p className="text-lg">
-              You completed the game in {moves} moves with a score of{' '}
-              {Math.max(0, score - moves * 5)}!
+              You completed the game in {moves} moves with a score of {score}!
             </p>
           </motion.div>
         )}
@@ -345,9 +341,7 @@ export default function Matchmeme() {
               </div>
               <div>
                 <p className="text-[#FF0B7A]">Final Score</p>
-                <p className="text-2xl font-bold">
-                  {Math.max(0, score - moves * 5)}
-                </p>
+                <p className="text-2xl font-bold">{score}</p>
               </div>
               <div>
                 <p className="text-[#FF0B7A]">Best Score</p>
@@ -373,7 +367,7 @@ export default function Matchmeme() {
               className="bg-[#FF0B7A] hover:bg-[#FF0B7A]/80 flex items-center gap-2"
             >
               <Home size={18} />
-              Return Home
+              Return Gamezone
             </Button>
           </div>
         </div>

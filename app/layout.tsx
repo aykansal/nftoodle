@@ -36,15 +36,15 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${ibm.variable} ${squid.variable}`}>
-      <body className="bg-[#0A0A0A] min-h-screen flex flex-col">
+      <body className="min-h-screen flex flex-col">
         <ThirdwebProvider>
-          <div className="bg-gray-900 min-h-screen h-full w-full">
+          <div className="min-h-screen h-full w-full">
             <Header />
             <AuthProvider>
               <BaseLayout>
                 <main className="flex-grow">{children}</main>
+                <Footer />
               </BaseLayout>
-              <Footer />
             </AuthProvider>
           </div>
           <Toaster />

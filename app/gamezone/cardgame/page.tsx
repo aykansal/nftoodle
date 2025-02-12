@@ -8,8 +8,9 @@ import { Card, CardContent } from '@/components/ui/card';
 import Loader from '@/components/loader';
 import { Swords, Shield, Zap, Home, RefreshCcw } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import type { CloudinaryUploadResponse } from '@/lib/types';
+import type { Meme } from '@/lib/types';
 import { Modal } from '@/components/ui/modal';
+import { toast } from 'sonner';
 
 interface MemeCard {
   id: number;
@@ -22,7 +23,7 @@ interface MemeCard {
 
 export default function CardGame() {
   const router = useRouter();
-  const [memes, setMemes] = useState<CloudinaryUploadResponse[]>([]);
+  const [memes, setMemes] = useState<Meme[]>([]);
   const [playerCards, setPlayerCards] = useState<MemeCard[]>([]);
   const [computerCards, setComputerCards] = useState<MemeCard[]>([]);
   const [selectedCard, setSelectedCard] = useState<MemeCard | null>(null);
@@ -42,8 +43,9 @@ export default function CardGame() {
   useEffect(() => {
     const fetchMemes = async () => {
       try {
-        const response = await axios.get('/api/memes');
-        setMemes(response.data);
+        const response = await axios.get('/api/memes?page=1&limit=20');
+        setMemes(response.data.memes);
+        console.log(response.data.memes);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching memes:', error);
@@ -55,10 +57,20 @@ export default function CardGame() {
   }, []);
 
   const initializeGame = () => {
+    if (memes.length < 10) {
+      toast.error(
+        'Not enough memes to start the game. At least 10 memes are required.'
+      );
+      console.error(
+        'Not enough memes to start the game. At least 10 memes are required.'
+      );
+      return;
+    }
+
     const shuffledMemes = [...memes].sort(() => Math.random() - 0.5);
     const playerMemes = shuffledMemes.slice(0, 5).map((meme, index) => ({
       id: index,
-      imageUrl: meme.url,
+      imageUrl: meme.cloudinaryUrl,
       power: Math.floor(Math.random() * 10) + 1,
       defense: Math.floor(Math.random() * 10) + 1,
       special: Math.floor(Math.random() * 10) + 1,
@@ -67,7 +79,7 @@ export default function CardGame() {
 
     const computerMemes = shuffledMemes.slice(5, 10).map((meme, index) => ({
       id: index + 5,
-      imageUrl: meme.url,
+      imageUrl: meme.cloudinaryUrl,
       power: Math.floor(Math.random() * 10) + 1,
       defense: Math.floor(Math.random() * 10) + 1,
       special: Math.floor(Math.random() * 10) + 1,
@@ -84,11 +96,18 @@ export default function CardGame() {
   };
 
   const handleCardSelect = (card: MemeCard) => {
-    if (card.isPlayed) return;
+    if (card.isPlayed || gameOver) return;
+
     setSelectedCard(card);
+    console.log(card);
 
     // Computer selects a random unplayed card
     const availableComputerCards = computerCards.filter((c) => !c.isPlayed);
+    if (availableComputerCards.length === 0) {
+      handleGameOver();
+      return;
+    }
+
     const randomCard =
       availableComputerCards[
         Math.floor(Math.random() * availableComputerCards.length)
@@ -119,7 +138,7 @@ export default function CardGame() {
       setRoundWinner(null);
     }
 
-    // Clear cards after 2 seconds
+    // Clear cards after 2 seconds and let the useEffect handle game completion
     setTimeout(() => {
       setSelectedCard(null);
       setComputerCard(null);
@@ -128,15 +147,16 @@ export default function CardGame() {
     }, 2000);
   };
 
-  const calculateBattleScore = (
-    playerCard: MemeCard,
-    computerCard: MemeCard
-  ) => {
-    const playerTotal =
-      playerCard.power + playerCard.defense + playerCard.special;
-    const computerTotal =
-      computerCard.power + computerCard.defense + computerCard.special;
-    return playerTotal - computerTotal;
+  const handleGameOver = () => {
+    setGameOver(true);
+    setShowGameSummaryModal(true);
+    const finalMessage =
+      playerScore > computerScore
+        ? "Congratulations! You've won the game!"
+        : playerScore < computerScore
+          ? 'Game Over! The computer wins!'
+          : "It's a tie game!";
+    setBattleResult(finalMessage);
   };
 
   useEffect(() => {
@@ -155,20 +175,6 @@ export default function CardGame() {
       checkGameOver();
     }
   }, [playerCards, computerCards, gameStarted, gameOver]);
-
-  const handleGameOver = () => {
-    setGameOver(true);
-    setShowGameSummaryModal(true);
-  };
-
-  // const handleEndGame = () => {
-  //   setShowEndGameModal(true);
-  // };
-
-  const handleEndGameConfirm = () => {
-    setShowEndGameModal(false);
-    handleGameOver();
-  };
 
   const handleRestart = () => {
     setGameOver(false);
@@ -202,7 +208,7 @@ export default function CardGame() {
               {gameStarted ? 'Restart Game' : 'Start Game'}
             </Button>
             <Button
-              onClick={() => router.push('/gamecenter')}
+              onClick={() => router.push('/gamezone')}
               className="bg-transparent hover:bg-[#FF0B7A]/10 text-[#FF0B7A] border-2 border-[#FF0B7A]"
             >
               <Home className="mr-2" size={18} />
@@ -289,7 +295,7 @@ export default function CardGame() {
               Cancel
             </Button>
             <Button
-              onClick={handleEndGameConfirm}
+              onClick={handleGameOver}
               className="bg-[#FF0B7A] hover:bg-[#FF0B7A]/80"
             >
               End Game
@@ -337,7 +343,7 @@ export default function CardGame() {
               Play Again
             </Button>
             <Button
-              onClick={() => router.push('/gamecenter')}
+              onClick={() => router.push('/gamezone')}
               className="bg-[#FF0B7A] hover:bg-[#FF0B7A]/80 flex items-center gap-2"
             >
               <Home size={18} />
@@ -381,4 +387,12 @@ function MemeCardComponent({ card }: { card: MemeCard }) {
       </CardContent>
     </Card>
   );
+}
+
+function calculateBattleScore(playerCard: MemeCard, computerCard: MemeCard) {
+  const playerTotal =
+    playerCard.power + playerCard.defense + playerCard.special;
+  const computerTotal =
+    computerCard.power + computerCard.defense + computerCard.special;
+  return playerTotal - computerTotal;
 }

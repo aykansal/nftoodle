@@ -35,23 +35,7 @@ export default function Footer() {
           <Square className="w-8 h-8 text-green-500 animate-spin" />
         </div>
       </div>
-      <AuthorDetails />
+      <AuthorDetails className='z-20' />
     </footer>
   );
-}
-
-{
-  /* <Link
-  href="https://x.com/aykansal"
-  className="text-[#FF0B7A] hover:underline"
-  >
-  Aykansal
-  </Link>
-  {" & "}
-  <Link
-  href="https://x.com/satyanshmittal"
-  className="text-[#FF0B7A] hover:underline"
-  >
-  Satyansh
-  </Link> */
 }

@@ -2,13 +2,13 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 // Define public routes that don't require authentication
-const PUBLIC_ROUTES = ['/', '/platforms', '/api/auth']
+const PUBLIC_ROUTES = ['/', '/platforms', '/api/auth', '/gamezone']
 
 // Define routes that require special permissions (e.g., admin routes)
 const PROTECTED_ROUTES = {
   admin: ['/admin'],
   creator: ['/create'],
-  user: ['/my-memes', '/gamezone']
+  user: ['/my-memes', '/gamezone/cardgame', '/gamezone/matchmeme']
 }
 
 export function middleware(request: NextRequest) {

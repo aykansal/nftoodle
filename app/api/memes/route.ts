@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { v2 as cloudinary } from 'cloudinary';
 import { prisma } from '@/lib/prisma';
-// import { getServerSession } from 'next-auth';
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
 
@@ -189,15 +188,15 @@ export async function GET(req: NextRequest) {
     });
 
     // Transform the data
-    const transformedMemes = memes.map(meme => ({
-      id: meme.id,
-      imageUrl: meme.cloudinaryUrl,
-      creator: meme.user?.userWallet.substring(0, 6) + '...' + meme.user?.userWallet.substring(meme.user?.userWallet.length - 6),
-      createdAt: meme.createdAt
-    }));
+    // const transformedMemes = memes.map(meme => ({
+    //   id: meme.id,
+    //   imageUrl: meme.cloudinaryUrl,
+    //   creator: meme.user?.userWallet.substring(0, 6) + '...' + meme.user?.userWallet.substring(meme.user?.userWallet.length - 6),
+    //   createdAt: meme.createdAt
+    // }));
 
     return NextResponse.json({
-      memes: transformedMemes,
+      memes,
       pagination: {
         currentPage: page,
         totalPages: Math.ceil(totalCount / limit),

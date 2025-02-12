@@ -142,3 +142,134 @@ export default function Gamezone() {
     </div>
   );
 }
+
+// new but req changes thats why commented
+
+// 'use client';
+
+// import { motion, AnimatePresence } from 'framer-motion';
+// import { Triangle, Circle, Square } from 'lucide-react';
+// import { useRouter } from 'next/navigation';
+// import { useEffect, useState } from 'react';
+// import { pageTransition, glitchAnimation } from '@/styles/animations';
+// import SquidBackground from '../../components/game/SquidBackground';
+// import GameCard from '../../components/game/GameCard';
+
+// const games = [
+//   {
+//     id: 1,
+//     title: 'Meme Battle',
+//     description: 'Create and battle with your memes against other players in this high-stakes competition!',
+//     icon: Triangle,
+//     comingSoon: false,
+//     route: '/gamezone/cardgame'
+//   },
+//   {
+//     id: 2,
+//     title: 'Meme Trading',
+//     description: 'Trade your rarest memes in this fast-paced marketplace. Will you make the right deals?',
+//     icon: Circle,
+//     comingSoon: false,
+//     route: '/gamezone/matchmeme'
+//   },
+//   {
+//     id: 3,
+//     title: 'NFT Quest',
+//     description: 'Embark on daily challenges to earn exclusive NFTs. Every quest brings you closer to legendary rewards!',
+//     icon: Square,
+//     comingSoon: true,
+//     route: ''
+//   },
+// ];
+
+// export default function Gamezone() {
+//   const router = useRouter();
+//   const [mounted, setMounted] = useState(false);
+//   const [selectedGame, setSelectedGame] = useState<number | null>(null);
+
+//   useEffect(() => {
+//     setMounted(true);
+//   }, []);
+
+//   if (!mounted) return null;
+
+//   const handleGameSelect = (gameId: number, route: string) => {
+//     setSelectedGame(gameId);
+//     // Add a slight delay before navigation for the animation
+//     setTimeout(() => {
+//       router.push(route);
+//     }, 300);
+//   };
+
+//   return (
+//     <AnimatePresence mode="wait">
+//       <motion.div 
+//         className="min-h-screen relative overflow-hidden"
+//         initial="initial"
+//         animate="animate"
+//         exit="exit"
+//         variants={pageTransition}
+//       >
+//         {/* Background */}
+//         <SquidBackground />
+
+//         {/* Content */}
+//         <div className="relative z-10 container mx-auto px-4 py-16">
+//           {/* Title */}
+//           <motion.div className="text-center mb-16">
+//             <motion.h1
+//               variants={glitchAnimation}
+//               className="text-6xl md:text-7xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary via-secondary to-primary font-squid"
+//             >
+//               Game Center
+//             </motion.h1>
+//             <motion.p
+//               initial={{ opacity: 0, y: 20 }}
+//               animate={{ opacity: 1, y: 0 }}
+//               transition={{ delay: 0.2 }}
+//               className="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto"
+//             >
+//               Choose your game and test your skills in our NFT gaming arena
+//             </motion.p>
+//           </motion.div>
+
+//           {/* Games Grid */}
+//           <motion.div 
+//             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto"
+//             variants={{
+//               animate: {
+//                 transition: {
+//                   staggerChildren: 0.1
+//                 }
+//               }
+//             }}
+//           >
+//             {games.map((game) => (
+//               <GameCard
+//                 key={game.id}
+//                 title={game.title}
+//                 description={game.description}
+//                 icon={game.icon}
+//                 comingSoon={game.comingSoon}
+//                 onClick={() => handleGameSelect(game.id, game.route)}
+//               />
+//             ))}
+//           </motion.div>
+//         </div>
+
+//         {/* Page transition overlay */}
+//         <AnimatePresence>
+//           {selectedGame && (
+//             <motion.div
+//               initial={{ opacity: 0 }}
+//               animate={{ opacity: 1 }}
+//               exit={{ opacity: 0 }}
+//               transition={{ duration: 0.3 }}
+//               className="fixed inset-0 bg-black z-50"
+//             />
+//           )}
+//         </AnimatePresence>
+//       </motion.div>
+//     </AnimatePresence>
+//   );
+// }

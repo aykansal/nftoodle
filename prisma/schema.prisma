@@ -15,7 +15,7 @@ model meme {
   createdAt     DateTime @default(now())
   user          user     @relation(fields: [userWallet], references: [userWallet])
   userWallet    String
-  minted        Boolean? @default(false)
+  minted        Boolean @default(false)
   txnhash       String?  @unique
 }
 

@@ -3,7 +3,6 @@
 import axios from 'axios';
 import Link from 'next/link';
 import Image from 'next/image';
-import { MemeData } from '@/lib/types';
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { useActiveAccount } from 'thirdweb/react';
@@ -11,9 +10,10 @@ import { Triangle, Circle, Square } from 'lucide-react';
 import { buttonVariants, cardVariants } from '@/styles/animations';
 import XShareButton from '@/components/XShareBtn';
 import MintNft from '@/components/thirdweb/MintNft';
+import { Meme } from '@/lib/types';
 
 export default function MyMemesPage() {
-  const [memes, setMemes] = useState<MemeData[]>([]);
+  const [memes, setMemes] = useState<Meme[]>([]);
   const [loading, setLoading] = useState(true);
 
   const activeUserAddress = useActiveAccount()?.address;

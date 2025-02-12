@@ -1,12 +1,14 @@
 // app/gallery/page.tsx
 
-"use client";
+'use client';
 
-import { useState, useEffect, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Triangle } from "lucide-react";
-import Image from "next/image";
-import { buttonVariants, cardVariants } from "@/styles/animations";
+import { useState, useEffect, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Triangle } from 'lucide-react';
+import Image from 'next/image';
+import { buttonVariants, cardVariants } from '@/styles/animations';
+import axios from 'axios';
+import { toast } from 'sonner';
 
 const ITEMS_PER_PAGE = 9;
 
@@ -25,14 +27,20 @@ export default function GalleryPage() {
 
   const fetchMemes = useCallback(async () => {
     try {
-      const response = await fetch(`/api/memes?page=${currentPage}&limit=${ITEMS_PER_PAGE}`);
-      if (!response.ok) throw new Error("Failed to fetch memes");
-      const data = await response.json();
-      
-      setMemes(prev => [...prev, ...data.memes]);
-      setHasMore(data.pagination.hasMore);
+      const response = await axios
+        .get(`/api/memes?page=${currentPage}&limit=${ITEMS_PER_PAGE}`)
+        .then((res) => res.data);
+      if (!response.memes) {
+        throw new Error('Failed to fetch memes');
+      }
+
+      setMemes((prev) => [...prev, ...response.memes]);
+      setHasMore(response.pagination.hasMore);
+      toast.success(`Fetched Memes for ${currentPage}`);
     } catch (error) {
-      console.error("Error fetching memes:", error);
+      toast.error('Error fetching memes, Try Again');
+      console.error('Error fetching memes:', error);
+      return;
     } finally {
       setLoading(false);
     }
@@ -64,7 +72,7 @@ export default function GalleryPage() {
             <motion.div
               animate={{
                 rotate: 360,
-                transition: { duration: 1, repeat: Infinity, ease: "linear" }
+                transition: { duration: 1, repeat: Infinity, ease: 'linear' },
               }}
             >
               <Triangle className="w-12 h-12 text-[#FF0B7A]" />
@@ -80,7 +88,7 @@ export default function GalleryPage() {
                 opacity: 1,
                 transition: {
                   staggerChildren: 0.1,
-                  duration: 0.3
+                  duration: 0.3,
                 },
               },
             }}
@@ -103,11 +111,13 @@ export default function GalleryPage() {
                         fill
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                         className="object-cover"
-                        loading={index < 6 ? "eager" : "lazy"}
+                        loading={index < 6 ? 'eager' : 'lazy'}
                       />
                     </div>
                     <div className="mt-4 flex justify-between items-center">
-                      <p className="text-gray-400 font-ibm">By {meme.creator}</p>
+                      <p className="text-gray-400 font-ibm">
+                        By {meme.creator}
+                      </p>
                       {/* <motion.button
                         variants={buttonVariants}
                         whileHover="hover"
@@ -134,7 +144,7 @@ export default function GalleryPage() {
               variants={buttonVariants}
               whileHover="hover"
               whileTap="tap"
-              onClick={() => setCurrentPage(prev => prev + 1)}
+              onClick={() => setCurrentPage((prev) => prev + 1)}
               className="squid-button px-8 py-3 rounded-lg will-change-transform"
             >
               Load More
