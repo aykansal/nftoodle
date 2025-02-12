@@ -15,14 +15,15 @@ model meme {
   createdAt     DateTime @default(now())
   user          user     @relation(fields: [userWallet], references: [userWallet])
   userWallet    String
-  minted        Boolean @default(false)
+  minted        Boolean  @default(false)
   txnhash       String?  @unique
 }
 
 model user {
   id         Int      @id @default(autoincrement())
-  userWallet String   @unique
   memes      meme[]
+  userWallet String   @unique
+  username   String  @unique
   createdAt  DateTime @default(now())
 }
 

@@ -20,22 +20,11 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import axios from 'axios';
 import { motion } from 'framer-motion';
 import { buttonVariants } from '@/styles/animations';
+import { MintNftData } from '@/lib/types';
 
 const CONTRACT_ADDRESS = '0xaC434dc0061aD90B45415e92b160D7Bbaa21F5db';
 const CHAIN_ID = 656476;
 const CLIENT_ID = 'aa99b0e9769d2262d120e7aec4ec7a94';
-
-interface MintNftData {
-  name: string;
-  description: string;
-  image: string;
-  minted: boolean;
-  memeId: number;
-  isMinting: boolean;
-  isCurrentMinting: boolean;
-  onMintStart: () => void;
-  onMintComplete: (txStatus: boolean) => void;
-}
 
 export default function MintNft({
   name,

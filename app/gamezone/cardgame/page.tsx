@@ -8,18 +8,11 @@ import { Card, CardContent } from '@/components/ui/card';
 import Loader from '@/components/loader';
 import { Swords, Shield, Zap, Home, RefreshCcw } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import type { Meme } from '@/lib/types';
+import type { Meme, MemeCard } from '@/lib/types';
 import { Modal } from '@/components/ui/modal';
 import { toast } from 'sonner';
 
-interface MemeCard {
-  id: number;
-  imageUrl: string;
-  power: number;
-  defense: number;
-  special: number;
-  isPlayed: boolean;
-}
+
 
 export default function CardGame() {
   const router = useRouter();

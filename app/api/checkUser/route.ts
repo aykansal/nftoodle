@@ -26,7 +26,8 @@ export async function POST(req: NextRequest) {
         // Create new user if doesn't exist
         const user = await prisma.user.create({
             data: {
-                userWallet
+                userWallet,
+                username: `${userWallet.substring(0, 4)}...${userWallet.substring(userWallet.length - 4)}`,
             },
         });
 

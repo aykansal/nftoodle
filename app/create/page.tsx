@@ -8,16 +8,10 @@ import { Pagination } from '@/components/ui/pagination';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
 import Loader from '@/components/loader';
+import { NFTCache } from '@/lib/types';
 
 const CACHE_KEY = 'nfts_cache';
 const ITEMS_PER_PAGE = 9;
-
-interface NFTCache {
-  urls: string[];
-  timestamp: number;
-  totalPages: number;
-  total: number;
-}
 
 export default function CreatePage() {
   const [selectedNft, setSelectedNft] = useState<number | null>(null);
@@ -182,12 +176,12 @@ export default function CreatePage() {
         onPageChange={handlePageChange}
       />
 
-      {/* Background animation
+      {/* Background animation */}
       <div className="top-0 left-0 z-[-1] absolute w-full h-full overflow-hidden">
         <div className="top-1/4 left-1/4 absolute bg-[#FF0B7A] opacity-20 blur-xl rounded-full w-64 h-64 animate-blob filter mix-blend-multiply"></div>
         <div className="top-3/4 right-1/4 absolute bg-[#45D62E] opacity-20 blur-xl rounded-full w-64 h-64 animate-blob animation-delay-2000 filter mix-blend-multiply"></div>
         <div className="bottom-1/4 left-1/3 absolute bg-[#FF0B7A] opacity-20 blur-xl rounded-full w-64 h-64 animate-blob animation-delay-4000 filter mix-blend-multiply"></div>
-      </div> */}
+      </div>
     </div>
   );
 }

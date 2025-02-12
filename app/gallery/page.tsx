@@ -9,15 +9,9 @@ import Image from 'next/image';
 import { buttonVariants, cardVariants } from '@/styles/animations';
 import axios from 'axios';
 import { toast } from 'sonner';
+import { Meme } from '@/lib/types';
 
 const ITEMS_PER_PAGE = 9;
-
-interface Meme {
-  id: string;
-  imageUrl: string;
-  creator: string;
-  createdAt: string;
-}
 
 export default function GalleryPage() {
   const [memes, setMemes] = useState<Meme[]>([]);
@@ -106,7 +100,7 @@ export default function GalleryPage() {
                   <div className="p-6">
                     <div className="relative aspect-square rounded-lg overflow-hidden">
                       <Image
-                        src={meme.imageUrl}
+                        src={meme.cloudinaryUrl}
                         alt={`Meme ${index + 1}`}
                         fill
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -116,7 +110,7 @@ export default function GalleryPage() {
                     </div>
                     <div className="mt-4 flex justify-between items-center">
                       <p className="text-gray-400 font-ibm">
-                        By {meme.creator}
+                        By {meme.user.username || 'Anonymous'}
                       </p>
                       {/* <motion.button
                         variants={buttonVariants}

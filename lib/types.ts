@@ -4,6 +4,7 @@ export interface User {
   userWallet: string;
   memes: Meme[];  // Related memes for the user
   createdAt: Date;
+  username:string;
 }
 
 export interface tokenList {
@@ -162,4 +163,32 @@ export enum Platforms {
   bazar = "bazar",
   opensea = "opensea",
   unleash = "unleash",
+}
+
+export interface NFTCache {
+  urls: string[];
+  timestamp: number;
+  totalPages: number;
+  total: number;
+}
+
+export interface MemeCard {
+  id: number;
+  imageUrl: string;
+  power: number;
+  defense: number;
+  special: number;
+  isPlayed: boolean;
+}
+
+export interface MintNftData {
+  name: string;
+  description: string;
+  image: string;
+  minted: boolean;
+  memeId: number;
+  isMinting: boolean;
+  isCurrentMinting: boolean;
+  onMintStart: () => void;
+  onMintComplete: (txStatus: boolean) => void;
 }
