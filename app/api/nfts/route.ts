@@ -1,8 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server"
 import axios from 'axios';
-import { tokenList } from '@/lib/types';
-import { fetchBazarTokens } from '@/hooks/fetch';
+import { fetchBazarTokens, fetchBuffersBazarCollection } from '@/hooks/fetch';
 import { fetchOpenSeaCollection, getDistinctValues } from '@/lib/utils';
 import { Platforms } from "@prisma/client";
 
@@ -16,9 +15,31 @@ async function isValidImageUrl(url: string): Promise<boolean> {
   }
 }
 
+async function handleNFTsFromUrl(nftUrls: string[], platform: Platforms) {
+  console.log(platform)
+  return Promise.all(
+    nftUrls.map(async (nftUrl) => {
+      if (nftUrl && nftUrl.includes('https://')) {
+        try {
+          const isValid = await isValidImageUrl(nftUrl);
+          if (isValid) {
+            await prisma.nfts.upsert({
+              where: { sourceUrl: nftUrl },
+              update: { platform },
+              create: { sourceUrl: nftUrl, platform },
+            });
+          }
+        } catch (err) {
+          console.error(`Error processing URL ${nftUrl} for platform ${platform}:`, err);
+        }
+      }
+    })
+  );
+}
+
 export async function GET() {
   const nfts = await prisma.nfts.findMany({});
-  if (!nfts) {
+  if (!nfts || nfts.length === 0) {
     const unleashKey = process.env.UNLEASH_API_KEY;
     const alchemyKey = process.env.ALCHEMY_API_KEY;
     const alchemyKey2 = process.env.ALCHEMY_API_KEY2;
@@ -28,105 +49,44 @@ export async function GET() {
     }
 
     try {
+      // Fetch from Unleash NFT marketplace
       const res = await axios.get(
         'https://api.unleashnfts.com/api/v2/nft/marketplace/metadata?sort_order=desc&offset=0&limit=100',
-        {
-          headers: {
-            accept: 'application/json',
-            'x-api-key': unleashKey,
-          },
-        }
+        { headers: { accept: 'application/json', 'x-api-key': unleashKey } }
       );
 
       const unleashUrls = getDistinctValues(
-        res.data.data
-          .filter((token: tokenList) => token.image_url)
-          ?.map((token: tokenList) => token.image_url)
+        res.data.data.filter((token: { image_url: string }) => token.image_url)?.map((token: { image_url: string }) => token.image_url)
       );
-      await Promise.all(
-        unleashUrls.map(async (nftUrl) => {
-          if (nftUrl && nftUrl.includes('https://')) {
-            const isValid = await isValidImageUrl(nftUrl);
-            if (isValid) {
-              await prisma.nfts.upsert({
-                where: {
-                  sourceUrl: nftUrl
-                },
-                update: {
-                  platform: Platforms.unleash
-                },
-                create: {
-                  sourceUrl: nftUrl,
-                  platform: Platforms.unleash
-                }
-              });
-            }
-          }
-        })
-      );
-      // Fetch URLs for 'opensea'
-      const alchemyUrlsCl1 = await fetchOpenSeaCollection(
-        '0xef0182dc0574cd5874494a120750fd222fdb909a',
-        alchemyKey
-      );
-      const alchemyUrlsCl2 = await fetchOpenSeaCollection(
-        '0x1A92f7381B9F03921564a437210bB9396471050C',
-        alchemyKey2
-      );
+
+      await handleNFTsFromUrl(unleashUrls, Platforms.unleash);
+
+      // Fetch from OpenSea collections (Alchemy APIs)
+      const alchemyUrlsCl1 = await fetchOpenSeaCollection('0xef0182dc0574cd5874494a120750fd222fdb909a', alchemyKey);
+      const alchemyUrlsCl2 = await fetchOpenSeaCollection('0x1A92f7381B9F03921564a437210bB9396471050C', alchemyKey2);
       const alchemyUrls = getDistinctValues([...alchemyUrlsCl1, ...alchemyUrlsCl2]);
 
-      await Promise.all(
-        alchemyUrls.map(async (nftUrl) => {
-          if (nftUrl && nftUrl.includes('https://')) {
-            const isValid = await isValidImageUrl(nftUrl);
-            if (isValid) {
-              await prisma.nfts.upsert({
-                where: {
-                  sourceUrl: nftUrl
-                },
-                update: {
-                  platform: Platforms.opensea
-                },
-                create: {
-                  sourceUrl: nftUrl,
-                  platform: Platforms.opensea
-                }
-              });
-            }
-          }
-        })
-      );
-      const bazarUrls = await fetchBazarTokens();
+      await handleNFTsFromUrl(alchemyUrls, Platforms.opensea);
 
-      await Promise.all(
-        bazarUrls.map(async (nftUrl) => {
-          if (nftUrl && nftUrl.includes('https://')) {
-            const isValid = await isValidImageUrl(nftUrl);
-            if (isValid) {
-              await prisma.nfts.upsert({
-                where: {
-                  sourceUrl: nftUrl
-                },
-                update: {
-                  platform: Platforms.bazar
-                },
-                create: {
-                  sourceUrl: nftUrl,
-                  platform: Platforms.bazar
-                }
-              });
-            }
-          }
-        })
-      );
+      // Fetch from Bazar
+      //@ts-expect-error ignore
+      const bazarUrls: string[] = await fetchBazarTokens().then(res => res.urls);
+      await handleNFTsFromUrl(bazarUrls, Platforms.bazar);
 
-      const urls: string[] = [...unleashUrls, ...bazarUrls, ...alchemyUrls]
+      // Fetch from Buffers Bazar collection
+      const thebuffersUrls = await fetchBuffersBazarCollection();
+      //@ts-expect-error ignore
+      await handleNFTsFromUrl(thebuffersUrls, Platforms.thebuffers);
 
-      return NextResponse.json({ data: urls })
+      // Combine all the URLs and return them
+      //@ts-expect-error ignore
+      const allUrls = [...unleashUrls, ...alchemyUrls, ...bazarUrls, ...thebuffersUrls];
+      return NextResponse.json(allUrls.length);
+
     } catch (err) {
-      console.error(`Error cron job:`, err);
-      return NextResponse.json(err)
+      console.error('Error during cron job:', err);
+      return NextResponse.json({ error: 'Error fetching NFT data', details: err });
     }
   }
-  return NextResponse.json(nfts)
-} 
+  return NextResponse.json(nfts);
+}

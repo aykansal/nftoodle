@@ -1,31 +1,42 @@
-"use client";
+'use client';
 
-import { motion } from "framer-motion";
-import Image from "next/image";
-import Link from "next/link";
-import { buttonVariants, cardVariants, containerVariants } from "@/styles/animations";
+import { motion } from 'framer-motion';
+import Image from 'next/image';
+import Link from 'next/link';
+import {
+  buttonVariants,
+  cardVariants,
+  containerVariants,
+} from '@/styles/animations';
 
 const platforms = [
   {
     id: 1,
-    name: "UnleashNFTs.com",
-    logo: "/unleash-logo.svg",
-    route: "/platforms/unleash",
-    description: "Unleash your NFTs",
+    name: 'UnleashNFTs.com',
+    logo: '/unleash-logo.svg',
+    route: '/platforms/unleash',
+    description: 'Unleash your NFTs',
   },
   {
     id: 2,
-    name: "Bazar.arweave.dev",
-    logo: "https://pbs.twimg.com/profile_images/1686990003266568192/El3x-VID_400x400.jpg",
-    route: "/platforms/bazar",
-    description: "Bazar NFT marketplace",
+    name: 'Bazar.arweave.dev',
+    logo: 'https://pbs.twimg.com/profile_images/1686990003266568192/El3x-VID_400x400.jpg',
+    route: '/platforms/bazar',
+    description: 'Bazar NFT marketplace',
   },
   {
     id: 3,
-    name: "OpenSea.io",
-    logo: "https://opensea.io/static/images/logos/opensea-logo.svg",
-    route: "/platforms/opensea",
-    description: "OpenSea NFT marketplace",
+    name: 'The Buffers',
+    logo: 'https://arweave.net/lIZ2tPFGxcSMws5il-H07c--JYmF55C1sEuJC8abMIw',
+    route: '/platforms/buffers',
+    description: 'The Buffers',
+  },
+  {
+    id: 4,
+    name: 'OpenSea.io',
+    logo: 'https://opensea.io/static/images/logos/opensea-logo.svg',
+    route: '/platforms/opensea',
+    description: 'OpenSea NFT marketplace',
   },
 ];
 
@@ -75,7 +86,9 @@ export default function PlatformsPage() {
                   <h2 className="font-bold font-ibm text-[#FF0B7A] text-2xl">
                     {platform.name}
                   </h2>
-                  <p className="text-center text-gray-400">{platform.description}</p>
+                  <p className="text-center text-gray-400">
+                    {platform.description}
+                  </p>
                   <motion.button
                     variants={buttonVariants}
                     whileHover="hover"

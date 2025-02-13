@@ -36,6 +36,17 @@ model nfts {
 
 enum Platforms {
   bazar
+  thebuffers
   opensea
   unleash
+}
+
+model buffernft {
+  id            Int      @id @default(autoincrement()) // Auto-incremented ID
+  imageUrl      String   // URL for the image
+  bootloaderName Json    // Store bootloader name as a JSON field
+  dateCreated   BigInt  // Timestamp as a BigInt for precision
+  topics        String[] // Array of topics
+  createdAt     DateTime @default(now()) // Timestamp of creation
+  updatedAt     DateTime @updatedAt // Timestamp for when the record was last updated
 }
