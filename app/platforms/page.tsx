@@ -28,7 +28,7 @@ const platforms = [
     id: 3,
     name: 'The Buffers',
     logo: 'https://arweave.net/lIZ2tPFGxcSMws5il-H07c--JYmF55C1sEuJC8abMIw',
-    route: '/platforms/buffers',
+    route: '/platforms/thebuffers',
     description: 'The Buffers',
   },
   {
