@@ -18,13 +18,6 @@ const platforms = [
     description: 'Unleash your NFTs',
   },
   {
-    id: 2,
-    name: 'Bazar.arweave.dev',
-    logo: 'https://pbs.twimg.com/profile_images/1686990003266568192/El3x-VID_400x400.jpg',
-    route: '/platforms/bazar',
-    description: 'Bazar NFT marketplace',
-  },
-  {
     id: 3,
     name: 'The Buffers',
     logo: 'https://arweave.net/lIZ2tPFGxcSMws5il-H07c--JYmF55C1sEuJC8abMIw',
@@ -38,6 +31,13 @@ const platforms = [
     route: '/platforms/opensea',
     description: 'OpenSea NFT marketplace',
   },
+  // {
+  //   id: 2,
+  //   name: 'Bazar.arweave.dev',
+  //   logo: 'https://pbs.twimg.com/profile_images/1686990003266568192/El3x-VID_400x400.jpg',
+  //   route: '/platforms/bazar',
+  //   description: 'Bazar NFT marketplace',
+  // },
 ];
 
 export default function PlatformsPage() {

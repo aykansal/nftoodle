@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server"
 import axios from 'axios';
-import { fetchBazarTokens, fetchBuffersBazarCollection } from '@/hooks/fetch';
+import { fetchBuffersBazarCollection } from '@/hooks/fetch';
 import { fetchOpenSeaCollection, getDistinctValues } from '@/lib/utils';
 import { Platforms } from "@prisma/client";
 
@@ -16,7 +16,7 @@ async function isValidImageUrl(url: string): Promise<boolean> {
 }
 
 async function handleNFTsFromUrl(nftUrls: string[], platform: Platforms) {
-  console.log(platform)
+  console.log(platform);
   return Promise.all(
     nftUrls.map(async (nftUrl) => {
       if (nftUrl && nftUrl.includes('https://')) {
@@ -69,18 +69,18 @@ export async function GET() {
       await handleNFTsFromUrl(alchemyUrls, Platforms.opensea);
 
       // Fetch from Bazar
-      //@ts-expect-error ignore
-      const bazarUrls: string[] = await fetchBazarTokens().then(res => res.urls);
-      await handleNFTsFromUrl(bazarUrls, Platforms.bazar);
+      // const bazarUrls: string[] = await fetchBazarTokens().then(res => res.urls);
+      // console.log(bazarUrls);
+      // await handleNFTsFromUrl(bazarUrls, Platforms.bazar);
 
       // Fetch from Buffers Bazar collection
       const thebuffersUrls = await fetchBuffersBazarCollection();
-      //@ts-expect-error ignore
-      await handleNFTsFromUrl(thebuffersUrls, Platforms.thebuffers);
 
-      // Combine all the URLs and return them
-      //@ts-expect-error ignore
-      const allUrls = [...unleashUrls, ...alchemyUrls, ...bazarUrls, ...thebuffersUrls];
+      // @ts-expect-error ignore
+      const newBufferUrls = thebuffersUrls.urls;
+      await handleNFTsFromUrl(newBufferUrls, Platforms.thebuffers);
+
+      const allUrls = [...unleashUrls, ...alchemyUrls, ...newBufferUrls];
       return NextResponse.json(allUrls.length);
 
     } catch (err) {
