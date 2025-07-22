@@ -116,9 +116,6 @@
            data-[state=active]:text-white;
   }
 
-  .squid-tab-wrapper {
-    /* @apply group; */
-  }
 
   .squid-slider {
     @apply w-full h-2 rounded-lg appearance-none
