@@ -35,9 +35,6 @@
 }
 
 @layer base {
-  * {
-    @apply font-ibm;
-  }
   body {
     @apply bg-background text-foreground;
     font-feature-settings:
@@ -50,7 +47,7 @@
   h4,
   h5,
   h6 {
-    @apply font-squid text-[#FF0B7A];
+    @apply text-[#FF0B7A];
   }
 }
 
@@ -59,7 +56,7 @@
     @apply relative overflow-hidden transition-all duration-300 
            bg-gradient-to-r from-[#FF0B7A] to-[#FF0B7A]/80
            hover:from-[#FF0B7A]/90 hover:to-[#FF0B7A]/70
-           text-white font-squid tracking-wider
+           text-white tracking-wider
            shadow-[0_0_10px_rgba(255,11,122,0.3)]
            hover:shadow-[0_0_20px_rgba(255,11,122,0.5)]
            active:scale-95;
@@ -212,7 +209,7 @@
     @apply relative overflow-hidden transition-all duration-300 
            border-2 border-[#FF0B7A] bg-transparent
            hover:bg-[#FF0B7A]/10
-           text-white font-squid tracking-wider
+           text-white tracking-wider
            shadow-[0_0_10px_rgba(255,11,122,0.3)]
            hover:shadow-[0_0_20px_rgba(255,11,122,0.5)]
            active:scale-95

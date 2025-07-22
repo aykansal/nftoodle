@@ -16,10 +16,6 @@ const config: Config = {
       },
     },
     extend: {
-      fontFamily: {
-        ibm: 'var(--font-ibm-plex-mono)',
-        squid: 'var(--font-squid)',
-      },
       colors: {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
