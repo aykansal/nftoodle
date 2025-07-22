@@ -1,4 +1,3 @@
-// MintNft.tsx
 'use client';
 
 import { main } from '@/app/api/mint-nft/get';
@@ -21,9 +20,9 @@ import axios from 'axios';
 import { motion } from 'framer-motion';
 import { buttonVariants } from '@/styles/animations';
 import { MintNftData } from '@/lib/types';
+import { chainConfig } from '@/lib/thirdweb';
 
 const CONTRACT_ADDRESS = '0xaC434dc0061aD90B45415e92b160D7Bbaa21F5db';
-const CHAIN_ID = 656476;
 const CLIENT_ID = 'aa99b0e9769d2262d120e7aec4ec7a94';
 
 export default function MintNft({
@@ -112,7 +111,7 @@ export default function MintNft({
 
       const contract = getContract({
         client,
-        chain: defineChain(CHAIN_ID),
+        chain: defineChain(chainConfig.CORE.testnetChainId),
         address: CONTRACT_ADDRESS,
       });
 

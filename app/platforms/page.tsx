@@ -31,13 +31,13 @@ const platforms = [
     route: '/platforms/opensea',
     description: 'OpenSea NFT marketplace',
   },
-  // {
-  //   id: 2,
-  //   name: 'Bazar.arweave.dev',
-  //   logo: 'https://pbs.twimg.com/profile_images/1686990003266568192/El3x-VID_400x400.jpg',
-  //   route: '/platforms/bazar',
-  //   description: 'Bazar NFT marketplace',
-  // },
+  {
+    id: 2,
+    name: 'Avalanche',
+    logo: 'https://pbs.twimg.com/profile_images/1686990003266568192/El3x-VID_400x400.jpg',
+    route: '/platforms/avalanche',
+    description: 'OpenSea on Avalanche',
+  },
 ];
 
 export default function PlatformsPage() {

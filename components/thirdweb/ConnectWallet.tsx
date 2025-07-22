@@ -1,12 +1,12 @@
 import axios from 'axios';
-import { chain, client } from '@/lib/thirdweb';
+import { coreChain, eduChain, client } from '@/lib/thirdweb';
 import { ConnectButton } from 'thirdweb/react';
 import { createWallet } from 'thirdweb/wallets';
 
 export default function ConnectWallet() {
   return (
     <ConnectButton
-      chain={chain}
+      chains={[coreChain, eduChain]}
       client={client}
       signInButton={{
         label: 'Sign in now!',
