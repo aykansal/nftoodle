@@ -1,53 +1,69 @@
-# NFToodle
+# React + TypeScript + Vite
 
-NFToodle is a fast, easy-to-use meme creation tool with a Squid Game-inspired theme. Create, customize, and share your memes with just a few clicks!
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-## Features
+Currently, two official plugins are available:
 
-- Squid Game-inspired user interface
-- Add custom top and bottom text to images
-- Adjust font size and color
-- Apply text effects (e.g., shadow)
-- Use image filters (grayscale, sepia, invert)
-- Automatic watermarking for branding
-- Download and share your created memes
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-## Usage
+## Expanding the ESLint configuration
 
-1. Choose a template or upload your own image.
-2. Add your top and bottom text.
-3. Customize the text size, color, and effects.
-4. Apply image filters if desired.
-5. Preview your meme in real-time.
-6. Click the "Download Meme" button to save your creation.
-7. Use the "Share" button to share your meme on social media platforms.
+If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
 
-## Technologies Used
+```js
+export default tseslint.config([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
 
-- Next.js 13 (App Router)
-- React
-- TypeScript
-- Tailwind CSS
-- shadcn/ui components
-- HTML Canvas API
+      // Remove tseslint.configs.recommended and replace with this
+      ...tseslint.configs.recommendedTypeChecked,
+      // Alternatively, use this for stricter rules
+      ...tseslint.configs.strictTypeChecked,
+      // Optionally, add this for stylistic rules
+      ...tseslint.configs.stylisticTypeChecked,
 
-## Contributing
+      // Other configs...
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
+```
 
-We welcome contributions to the NFToodle! Please follow these steps to contribute:
+You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
-1. Fork the repository.
-2. Create a new branch for your feature or bug fix.
-3. Make your changes and commit them with descriptive commit messages.
-4. Push your changes to your fork.
-5. Submit a pull request to the main repository.
+```js
+// eslint.config.js
+import reactX from 'eslint-plugin-react-x'
+import reactDom from 'eslint-plugin-react-dom'
 
-Please ensure your code follows the existing style and includes appropriate tests.
-
-## License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
-## Acknowledgements
-
-- Inspired by the visual style of Squid Game
-- Built with 💖 by the NFToodle team
+export default tseslint.config([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
+      // Enable lint rules for React
+      reactX.configs['recommended-typescript'],
+      // Enable lint rules for React DOM
+      reactDom.configs.recommended,
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
+```
