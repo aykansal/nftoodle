@@ -194,3 +194,183 @@ export interface MintNftData {
   onMintStart: () => void;
   onMintComplete: (txStatus: boolean) => void;
 }
+
+// Game NFT Types (matching backend)
+export interface GameNFTStats {
+  level: number;
+  experience: number;
+  condition: number;
+  mood: number;
+  lastInteraction: number;
+  evolutionStage: number;
+  breedingCooldown: number;
+  species: string;
+  rarity: number;
+  baseStats: number[]; // [strength, intelligence, agility, luck, charisma]
+  visualTraits: string[]; // Visual characteristics
+}
+
+export interface GameNFT {
+  id: number;
+  tokenId: number;
+  contractAddress: string;
+  ownerAddress: string;
+  stats: GameNFTStats;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface NFTInteraction {
+  id: number;
+  tokenId: number;
+  actionType: ActionType;
+  timestamp: number;
+  statChanges: {
+    experience?: number;
+    condition?: number;
+    mood?: number;
+    level?: number;
+  };
+}
+
+export interface EvolutionHistory {
+  id: number;
+  tokenId: number;
+  fromStage: number;
+  toStage: number;
+  timestamp: number;
+  triggerConditions: {
+    level: number;
+    experience: number;
+    interactions: number;
+  };
+}
+
+export interface BreedingRecord {
+  id: number;
+  parent1TokenId: number;
+  parent2TokenId: number;
+  offspringTokenId: number;
+  timestamp: number;
+  inheritedTraits: {
+    fromParent1: string[];
+    fromParent2: string[];
+    mutations: string[];
+  };
+}
+
+export interface UserRewards {
+  id: number;
+  userWallet: string;
+  totalXP: number;
+  currentStreak: number;
+  lastInteractionDate: string;
+  achievements: Achievement[];
+}
+
+export interface Achievement {
+  id: string;
+  name: string;
+  description: string;
+  rewardXP: number;
+  unlockedAt: string;
+}
+
+// Enums
+export enum ActionType {
+  FEED = 'FEED',
+  TRAIN = 'TRAIN',
+  PLAY = 'PLAY',
+  REST = 'REST',
+  CLEAN = 'CLEAN'
+}
+
+export enum EvolutionStage {
+  EGG = 0,
+  BABY = 1,
+  JUVENILE = 2,
+  ADULT = 3,
+  ELDER = 4,
+  LEGENDARY = 5
+}
+
+// API Request/Response Types
+export interface MintGameNFTRequest {
+  userWallet: string;
+  species?: string;
+  paymentTxHash?: string;
+}
+
+export interface InteractWithNFTRequest {
+  tokenId: number;
+  actionType: ActionType;
+  userWallet: string;
+}
+
+export interface BreedNFTsRequest {
+  parent1TokenId: number;
+  parent2TokenId: number;
+  userWallet: string;
+}
+
+export interface GameNFTResponse {
+  tokenId: number;
+  stats: GameNFTStats;
+  metadata: {
+    name: string;
+    description: string;
+    image: string;
+    attributes: Array<{
+      trait_type: string;
+      value: string | number;
+    }>;
+  };
+  evolutionHistory: EvolutionHistory[];
+  lastInteractions: NFTInteraction[];
+}
+
+export interface MarketplaceFilterRequest {
+  species?: string;
+  evolutionStage?: EvolutionStage;
+  minLevel?: number;
+  maxLevel?: number;
+  minRarity?: number;
+  maxRarity?: number;
+  traits?: string[];
+  priceRange?: {
+    min: number;
+    max: number;
+  };
+  page?: number;
+  limit?: number;
+  sortBy?: 'level' | 'rarity' | 'price' | 'lastInteraction';
+  sortOrder?: 'asc' | 'desc';
+}
+
+// Component Props Types
+export interface GameNFTCardProps {
+  nft: GameNFT;
+  onInteract?: (tokenId: number, action: ActionType) => void;
+  onEvolve?: (tokenId: number) => void;
+  showActions?: boolean;
+  className?: string;
+}
+
+export interface InteractionPanelProps {
+  tokenId: number;
+  stats: GameNFTStats;
+  onInteract: (action: ActionType) => void;
+  disabled?: boolean;
+}
+
+export interface StatsDisplayProps {
+  stats: GameNFTStats;
+  showEvolutionProgress?: boolean;
+  className?: string;
+}
+
+export interface EvolutionTimelineProps {
+  evolutionHistory: EvolutionHistory[];
+  currentStage: number;
+  className?: string;
+}
