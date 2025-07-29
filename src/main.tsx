@@ -5,17 +5,10 @@ import { createBrowserRouter, RouterProvider } from "react-router";
 import MainPlatformPage from "./pages/platforms/[platform]/page";
 import RootLayout from "./components/layouts/RootLayout";
 import Matchmeme from "./pages/gamezone/matchmeme/page";
-import ErrorPage from "./components/layouts/ErrorPage";
-import PlatformsPage from "./pages/platforms/page";
-import MyMemesPage from "./pages/my-memes/page";
-import CreatePage from "./pages/create/page";
-import Gamezone from "./pages/gamezone/page";
-import LandingPage from "./pages/LandingPage";
-import GalleryPage from "./pages/gallery/page";
-import GameLayout from "./pages/gamezone/layout";
-import CardGame from "./pages/gamezone/cardgame/page";
-import CreateNftPage from "./pages/create/[nftId]/page";
+import ErrorPage from "./components/ErrorPage";
 import SecondaryLayout from "./components/layouts/SecondaryLayout";
+import GameNFTMinter from "./components/game-nft/GameNFTMinter";
+import { LandingPage, PlatformsPage, MyMemesPage, CreatePage, Gamezone, GalleryPage, GameLayout, CardGame, CreateNftPage } from "./pages";
 
 const router = createBrowserRouter([
   {
@@ -33,6 +26,10 @@ const router = createBrowserRouter([
           {
             path: "platforms",
             element: <PlatformsPage />,
+          },
+          {
+            path: "minter",
+            element: <GameNFTMinter />,
           },
           {
             path: "platforms/:platform",

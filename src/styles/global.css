@@ -360,3 +360,13 @@
     --radius: 0.75rem;
   }
 }
+/* Hide scrollbars globally */
+body, * {
+  scrollbar-width: none;         /* Firefox */
+  -ms-overflow-style: none;      /* IE and Edge */
+}
+
+body::-webkit-scrollbar,
+*::-webkit-scrollbar {
+  display: none;                 /* Chrome, Safari, Opera */
+}
